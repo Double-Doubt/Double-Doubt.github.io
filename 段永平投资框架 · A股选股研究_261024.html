@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>段永平投资框架 · A股选股研究</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230f766e'/%3E%3Ctext x='16' y='22' font-size='17' text-anchor='middle' fill='%23f6f3ec' font-family='serif' font-weight='700'%3E段%3C/text%3E%3C/svg%3E">
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Serif+SC:wght@600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap">
+<script src="https://fastly.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+<style>
+:root{
+  --paper:#f6f3ec; --ink:#1c2733; --ink2:#2c3947; --card:#ffffff;
+  --jade:#0f766e; --jade-soft:#e3efed; --amber:#b7791f; --amber-soft:#f4e8d3;
+  --slate:#475569; --slate-soft:#e7eaef; --line:#e4ddcd; --muted:#6b7280; --na:#9aa3ad;
+  --danger:#9a3412;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--paper);color:var(--ink);font-family:"Noto Sans SC",-apple-system,"PingFang SC","Microsoft YaHei",sans-serif;line-height:1.7;font-size:15px;-webkit-font-smoothing:antialiased}
+h1,h2,h3,.serif{font-family:"Noto Serif SC","Songti SC",serif}
+.wrap{max-width:1180px;margin:0 auto;padding:0 22px}
+a{color:var(--jade)}
+
+/* ---------- top nav ---------- */
+.nav{position:sticky;top:0;z-index:50;background:rgba(246,243,236,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.nav .wrap{display:flex;align-items:center;gap:18px;height:52px;overflow-x:auto}
+.nav .brand{font-family:"Noto Serif SC",serif;font-weight:700;color:var(--jade);white-space:nowrap;font-size:15px}
+.nav a{white-space:nowrap;font-size:13px;color:var(--ink2);text-decoration:none}
+.nav a:hover{color:var(--jade)}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(160deg,#1c2733 0%,#22303d 60%,#0f3b36 100%);color:#f4f1e8;padding:56px 0 46px}
+.hero .kicker{letter-spacing:3px;font-size:12px;color:#9fd0c8;text-transform:uppercase;margin-bottom:14px}
+.hero h1{font-size:34px;font-weight:900;line-height:1.3;color:#fff;max-width:820px}
+.hero h1 em{font-style:normal;color:#e6b45a}
+.hero .sub{margin-top:14px;color:#cdd6cf;max-width:760px;font-size:14.5px}
+.hero-badge{position:static;display:inline-block;margin-top:18px;padding:7px 15px;border:1px solid #e6b45a;color:#e6b45a;border-radius:999px;font-size:12.5px;letter-spacing:.5px}
+.meta-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:30px}
+.meta{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px}
+.meta .n{font-family:"Noto Serif SC",serif;font-size:26px;font-weight:700;color:#fff}
+.meta .l{font-size:12px;color:#a9b6ad;margin-top:3px}
+.meta .n.amber{color:#e6b45a}
+
+/* ---------- sections ---------- */
+section{padding:46px 0 8px}
+.sec-head{display:flex;align-items:baseline;gap:14px;border-bottom:2px solid var(--ink);padding-bottom:10px;margin-bottom:22px}
+.sec-no{font-family:"Noto Serif SC",serif;color:var(--jade);font-weight:700;font-size:15px}
+.sec-head h2{font-size:24px;font-weight:700}
+.sec-head .en{margin-left:auto;font-size:11px;color:var(--muted);letter-spacing:2px}
+.lead{color:var(--ink2);max-width:880px;margin-bottom:20px}
+
+/* funnel */
+.funnel-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:26px;align-items:stretch}
+#funnel{height:380px}
+.pillars{display:grid;gap:12px}
+.pillar{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;border-left:4px solid var(--jade)}
+.pillar.p2{border-left-color:var(--amber)}
+.pillar.p3{border-left-color:var(--slate)}
+.pillar h4{font-size:15px;margin-bottom:4px}
+.pillar p{font-size:13px;color:var(--ink2)}
+.stopdo{margin-top:14px;background:#fbf6ec;border:1px dashed var(--amber);border-radius:12px;padding:14px 16px}
+.stopdo h4{color:var(--amber);font-size:14px;margin-bottom:6px}
+.stopdo .tags{display:flex;flex-wrap:wrap;gap:8px}
+.stopdo span{background:#fff;border:1px solid var(--amber);color:var(--amber);border-radius:999px;padding:3px 12px;font-size:12.5px}
+
+/* quant tags */
+.qtile{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.qtile h4{font-size:15px;margin-bottom:10px;color:var(--jade)}
+.qtile ul{list-style:none;display:grid;grid-template-columns:1fr 1fr;gap:7px 22px}
+.qtile li{font-size:13.5px;padding-left:18px;position:relative;color:var(--ink2)}
+.qtile li::before{content:"";position:absolute;left:0;top:9px;width:7px;height:7px;border-radius:2px;background:var(--jade)}
+.qtile.excl li::before{background:var(--danger)}
+.qtile.excl h4{color:var(--danger)}
+.qnote{margin-top:12px;font-size:12.5px;color:var(--muted)}
+.qtgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+
+/* table */
+.tablecard{background:var(--card);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.tbl-note{font-size:12px;color:var(--muted);padding:10px 16px;background:#fbf9f3;border-bottom:1px solid var(--line)}
+.tscroll{overflow-x:auto}
+table{border-collapse:collapse;width:100%;min-width:1080px;font-size:12.8px}
+th,td{padding:8px 10px;text-align:right;border-bottom:1px solid #eee9dc;white-space:nowrap}
+th{background:#f3eee1;font-weight:500;color:var(--ink2);position:sticky;top:0}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2),th:nth-child(3),td:nth-child(3){text-align:left}
+tr.group-core td{background:var(--amber-soft);font-weight:700;color:var(--amber);text-align:left}
+tr.group-watch td{background:var(--slate-soft);font-weight:700;color:var(--slate);text-align:left}
+td.name{font-weight:500}
+.na{color:var(--na);font-size:12px}
+.tier-badge{display:inline-block;padding:1px 9px;border-radius:999px;font-size:11px}
+.t-core{background:var(--amber);color:#fff}
+.t-watch{background:var(--slate);color:#fff}
+
+/* charts */
+.chartcard{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 18px 8px;margin-bottom:22px}
+.chartcard h3{font-size:16px;margin-bottom:2px}
+.chartcard .cq{font-size:12.5px;color:var(--muted);margin-bottom:8px}
+.chart{width:100%;height:430px}
+.chart.tall{height:640px}
+.cfoot{font-size:12px;color:var(--muted);border-top:1px dashed var(--line);padding:9px 2px 12px}
+
+/* cluster sections + cards */
+.cluster-head{margin:30px 0 14px;display:flex;align-items:center;gap:12px}
+.cluster-head .dot{width:11px;height:11px;border-radius:50%;background:var(--jade)}
+.cluster-head h3{font-size:19px}
+.cluster-head .cnt{font-size:12.5px;color:var(--muted)}
+.cardgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 18px 14px;box-shadow:0 1px 3px rgba(28,39,51,.05);display:flex;flex-direction:column}
+.card.core{border-top:3px solid var(--amber)}
+.card.watch{border-top:3px solid var(--slate)}
+.card-h{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.card-h .nm{font-family:"Noto Serif SC",serif;font-size:18px;font-weight:700}
+.card-h .code{font-size:12px;color:var(--muted);font-family:ui-monospace,monospace}
+.card-h .ind{font-size:12px;color:var(--jade);margin-top:2px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;background:#faf7f0;border-radius:10px;padding:10px;margin-bottom:10px}
+.metric .ml{font-size:10.5px;color:var(--muted)}
+.metric .mv{font-size:13.5px;font-weight:600}
+.bankline{grid-column:1/-1;font-size:11.5px;color:var(--amber);background:#fff;border:1px dashed var(--amber);border-radius:8px;padding:6px 9px}
+.roe-row{display:flex;align-items:flex-end;gap:8px;margin-bottom:10px}
+.roe-row .rl{font-size:11px;color:var(--muted)}
+.roe-bars{display:flex;align-items:flex-end;gap:5px;height:46px;flex:1}
+.roe-bars .rb{flex:1;background:var(--jade-soft);border-bottom:2px solid var(--jade);position:relative;text-align:center;font-size:9.5px;color:var(--slate);padding-bottom:1px}
+.roe-bars .rb.neg{border-bottom-color:var(--danger)}
+.three{display:grid;gap:7px;margin-bottom:10px}
+.tri{display:flex;gap:9px;font-size:12.6px;line-height:1.6;color:var(--ink2)}
+.tri .ic{flex:0 0 auto;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff;font-family:"Noto Serif SC",serif;margin-top:2px}
+.tri.u .ic{background:var(--jade)} .tri.g .ic{background:var(--amber)} .tri.c .ic{background:var(--slate)}
+.tri b{color:var(--ink)}
+.moattags{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:9px}
+.moattags span{background:var(--jade-soft);color:var(--jade);border-radius:999px;padding:2px 10px;font-size:11.5px}
+.dividend{font-size:12px;color:var(--ink2);background:#fbf9f3;border-radius:8px;padding:8px 10px;margin-bottom:9px;border-left:3px solid var(--jade)}
+.risks{font-size:12px;border:1px solid #e8c9a8;background:#fdf6ee;border-radius:8px;padding:8px 11px;margin-bottom:8px}
+.risks b{color:var(--danger)}
+.risks ul{margin:4px 0 0 16px}
+.risks li{margin-bottom:3px}
+details{font-size:11.5px;color:var(--muted);border-top:1px dashed var(--line);padding-top:7px}
+details summary{cursor:pointer;color:var(--jade);outline:none}
+details ul{margin:6px 0 0 16px}
+details li{margin-bottom:3px;line-height:1.55}
+
+/* footer disclaimer */
+.src{background:var(--ink);color:#d7ded7;border-radius:16px;padding:26px 28px;margin:40px 0 60px;font-size:13px}
+.src h3{color:#fff;font-size:17px;margin-bottom:12px}
+.src p{margin-bottom:9px;color:#c3cdc4}
+.src .big{display:block;text-align:center;font-family:"Noto Serif SC",serif;font-size:20px;font-weight:900;color:#e6b45a;border-top:1px solid rgba(255,255,255,.15);margin-top:16px;padding-top:16px}
+
+@media (max-width:820px){
+  .meta-grid{grid-template-columns:repeat(2,1fr)}
+  .funnel-wrap{grid-template-columns:1fr}
+  #funnel{height:320px}
+  .qtgrid{grid-template-columns:1fr}
+  .qtile ul{grid-template-columns:1fr}
+  .hero h1{font-size:26px}
+  .cardgrid{grid-template-columns:1fr}
+  .chart{height:360px}
+  .chart.tall{height:560px}
+  .sec-head .en{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="wrap">
+    <span class="brand">段永平框架 · A股研究</span>
+    <a href="#method">方法论</a>
+    <a href="#quant">量化门槛</a>
+    <a href="#table">总览表</a>
+    <a href="#charts">指标对比</a>
+    <a href="#cards">标的卡片</a>
+    <a href="#source">口径与免责</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="kicker">DUAN YONGPING FRAMEWORK · EQUITY SCREEN</div>
+    <h1>段永平投资框架 · <em>A股选股研究</em></h1>
+    <p class="sub">以"买股票=买公司=买未来净现金流折现"为纲，按「懂不懂 → 好不好 → 便不便宜」三段式，对 A 股具备长期高 ROE、稳健现金流与持续分红特征的公司做框架符合性梳理。分层仅表达符合框架的程度，非收益排序。</p>
+    <span class="hero-badge">框架研究参考 · 非投资建议</span>
+    <div class="meta-grid">
+      <div class="meta"><div class="n">2026-10-23</div><div class="l">行情/估值收盘日（最近交易日）</div></div>
+      <div class="meta"><div class="n">FY2025</div><div class="l">最近完整年报口径</div></div>
+      <div class="meta"><div class="n amber" id="mTotal">36</div><div class="l">纳入候选（核心 8 + 观察 28）</div></div>
+      <div class="meta"><div class="n">iFinD</div><div class="l">行情/财务/估值分位来源</div></div>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <!-- 方法论 漏斗 -->
+  <section id="method">
+    <div class="sec-head"><span class="sec-no">01</span><h2>方法论：三段式筛选漏斗</h2><span class="en">FRAMEWORK · FUNNEL</span></div>
+    <p class="lead">先用量化门槛把"生意质地"的粗筛做掉，再用三段式做定性论证——任一环节不通过即不纳入，宁缺毋滥、可证伪。</p>
+    <div class="funnel-wrap">
+      <div id="funnel"></div>
+      <div class="pillars">
+        <div class="pillar"><h4>① 懂不懂（能力圈）</h4><p>业务简单可理解、未来现金流大致可预测；标准是"买下整个公司、10 年不上市也能睡好觉"。安全边际来自对公司的理解度，而非价格折扣。</p></div>
+        <div class="pillar p2"><h4>② 好不好（商业模式 + 企业文化）</h4><p>护城河是否长期坚固（品牌/成本/网络效应/牌照/规模），长期毛利率与净现金流是否稳健；聚焦主业、产品导向、善待股东（持续分红/回购）。</p></div>
+        <div class="pillar p3"><h4>③ 便不便宜（毛估估）</h4><p>看市值与未来 5–10 年利润走向，估值锚是机会成本（长期国债/存款收益率）；财报用于排除与佐证，不做公式化精算，结合 PE/PB 近 10 年分位辅助。</p></div>
+        <div class="stopdo">
+          <h4>Stop Doing List（不做的事）</h4>
+          <div class="tags"><span>不做空</span><span>不借钱/不加杠杆</span><span>不碰不懂的</span><span>不看图看线</span><span>不抄作业</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 量化门槛 -->
+  <section id="quant">
+    <div class="sec-head"><span class="sec-no">02</span><h2>量化初筛门槛</h2><span class="en">QUANTITATIVE FILTERS</span></div>
+    <div class="qtgrid">
+      <div class="qtile">
+        <h4>纳入方向（粗筛门槛）</h4>
+        <ul>
+          <li>近 5 年（2021–2025）多数年度加权 ROE 达标，银行/公用事业等按行业放宽并说明</li>
+          <li>毛利率长期稳定或提升</li>
+          <li>经营现金流/经营活动净收益长期匹配（重资产折旧行业可显著大于 1）</li>
+          <li>资产负债率按行业特性看待，不一刀切</li>
+          <li>有持续现金分红记录</li>
+          <li>行业龙头或具品牌/成本定价权</li>
+        </ul>
+      </div>
+      <div class="qtile excl">
+        <h4>直接排除项</h4>
+        <ul>
+          <li>ST / 连续亏损</li>
+          <li>无差异化、靠价格战生存</li>
+          <li>商誉/质押风险高</li>
+          <li>依赖补贴或非经常损益</li>
+          <li>重资产高杠杆且现金流差</li>
+          <li>管理层诚信存疑、纯利益导向</li>
+        </ul>
+        <p class="qnote">说明：财报用于排除与佐证，不做精确 DCF；估值锚是机会成本。银行/保险不适用毛利率与资产负债率，改用不良率、拨备覆盖率、净息差、资本充足率（或内含价值/NBV）口径。</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 总览表 -->
+  <section id="table">
+    <div class="sec-head"><span class="sec-no">03</span><h2>候选总览表</h2><span class="en">OVERVIEW TABLE</span></div>
+    <div class="tablecard">
+      <div class="tbl-note">行情与估值截至 2026-10-23 收盘；财务为 FY2025 年报；PE/PB 分位为近 10 年窗口。灰字"未取到"表示该字段未取得，不臆造为 0。下表按核心层 / 观察层分组，不排序、不排名。</div>
+      <div class="tscroll"><div id="overviewTable"></div></div>
+    </div>
+  </section>
+
+  <!-- 图表 -->
+  <section id="charts">
+    <div class="sec-head"><span class="sec-no">04</span><h2>关键指标对比</h2><span class="en">CHARTS</span></div>
+
+    <div class="chartcard">
+      <h3>谁处在历史估值的什么位置？</h3>
+      <div class="cq">图A · PE(TTM) 近 10 年历史分位（%，越低越靠近历史低位）｜ 数据截至 2026-10-23</div>
+      <div id="chartA" class="chart tall"></div>
+      <div class="cfoot">读到什么：琥珀=核心层、玉绿=观察层，虚线为 50% 中位。不能据此推出涨跌——低分位可能是"价值陷阱"，高分位也可能是优质资产溢价，须结合商业模式与盈利方向。</div>
+    </div>
+
+    <div class="chartcard">
+      <h3>赚钱能力 vs 股东回馈：2025 ROE 与股息率</h3>
+      <div class="cq">图B · 柱=2025 加权 ROE(%)，线=股息率 TTM(%) ｜ FY2025 / 截至 2026-10-23</div>
+      <div id="chartB" class="chart tall"></div>
+      <div class="cfoot">读到什么：高 ROE 且高股息的组合，是"生意好+愿分钱"的直观画像。银行/保险已纳入；银行不适用毛利率口径，但其 ROE/股息率可比。ROE 高不代表未来持续，须看护城河与周期位置。</div>
+    </div>
+
+    <div class="chartcard">
+      <h3>各行业簇的赚钱能力稳不稳？</h3>
+      <div class="cq">图C · 按行业簇分组的近 5 年（2021–2025）平均加权 ROE(%) 走势</div>
+      <div id="chartC" class="chart"></div>
+      <div class="cfoot">读到什么：看曲线是否平稳、穿越周期。周期/制造类曲线波动天然更大，需结合 PB 与现金流而非单年 ROE 判断；斜率向下提示盈利中枢可能下移。</div>
+    </div>
+  </section>
+
+  <!-- 卡片 -->
+  <section id="cards">
+    <div class="sec-head"><span class="sec-no">05</span><h2>分行业标的卡片</h2><span class="en">COMPANY CARDS</span></div>
+    <p class="lead">按 4 个行业簇分组，每只候选一张卡：指标条 + 近 5 年 ROE + 三段式论证 + 护城河标签 + 股东回报 + 风险证伪点 + 可折叠证据。</p>
+    <div id="cardSections"></div>
+  </section>
+
+  <!-- 来源/免责 -->
+  <section id="source">
+    <div class="src">
+      <h3>数据来源、口径与免责声明</h3>
+      <p><b style="color:#fff">数据来源：</b>行情、财务与估值分位取自同花顺 iFinD（行情截至 2026-10-23 收盘、最近完整财报为 FY2025 年报，2026H1 作趋势补充）；定性信息来自 iFinD 新闻/公告及公开检索，标注于各卡片证据。</p>
+      <p><b style="color:#fff">口径注：</b>PE/PB 分位为近 10 年窗口；现金流比率口径为"经营活动现金流净额/经营活动净收益"；银行/保险不适用毛利率与资产负债率，改用不良率/拨备覆盖率/净息差/资本充足率（保险为内含价值/NBV）；周期股 PE 受周期位置影响，需结合 PB 与现金流。</p>
+      <p><b style="color:#fff">分层说明：</b>核心层与观察层仅表达"符合段永平投资框架的程度"，不是推荐榜、不排序、不打星；历史表现不代表未来。缺失字段以"未取到"标注，未做估算补零。</p>
+      <span class="big">以上内容仅供参考，不构成投资建议。</span>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const STOCKS = [{"code": "600519.SH", "name": "贵州茅台", "industry": "白酒", "cluster": "白酒/食品饮料", "data_date": "2026-10-23", "price": 1335.0, "market_cap_yi": 16688.6, "pe_ttm": 20.49, "pb": 6.64, "dividend_yield_ttm": 3.89, "pe_pct_10y": 9.59, "pb_pct_10y": 9.52, "roe_5y": {"2021": 29.9, "2022": 30.26, "2023": 34.19, "2024": 36.02, "2025": 32.53}, "gross_margin_latest": 91.18, "gross_margin_trend": "稳定（长期91%左右）", "ocf_to_income": 0.54, "debt_ratio": 16.42, "bank_special": null, "dividend_buyback": "2025年全年分红650.33亿（中期300亿+年度350.33亿），占归母净利约79%；公司2024-2026三年分红规划承诺每年现金分红不低于归母净利75%；设有回购专用账户（2026年3月末持有79.4万股）。来源：公司2025年度利润分配公告2026-04-17（moutai.com.cn）、21财经2026-08-19。", "understand": "业务极简单——酿造并销售茅台酒及系列酒，品牌、赤水河流域产能与老酒储备具备稀缺性，未来10年净现金流大致可预测，是框架下最接近'买下整个公司、10年不上市也能睡好觉'的A股资产之一。2025年上市以来首现营收净利双降、2026Q2单季负增长，说明需求端受宏观消费周期影响，但不改变商业模式本身。", "good": "护城河为品牌定价权+文化稀缺+渠道配额制，FY2025毛利率91.18%、资产负债率仅16.42%几乎无有息负债；OCF/经营净收益0.54系白酒合同负债（预收款）波动的行业特性，非盈利质量问题。企业文化上分红率从过往约50%提升至2025年的79%，并写入三年规划，善待股东的方向明确。", "cheap": "PE(TTM)20.49倍、PE/PB近10年（2016-10-24起）分位仅9.59%/9.52%，处于历史最低区间附近；对照长期国债收益率与茅台未来利润走向，毛估估估值已回到低位。2026年3月底飞天出厂价上调至1269元、2026年10月散瓶批价仍约1780元下行，批价是主要跟踪变量而非资产负债表风险。", "moat": ["品牌定价权", "文化稀缺", "渠道配额制"], "risks": ["飞天批价持续下行（2026-10-24酒价：原箱约1830元、散瓶约1780元），若向出厂价1269元靠拢将收窄渠道利润、动摇挺价逻辑", "2025年上市以来首现业绩双降、2026Q2单季营收-5.23%/归母净利-6.90%（2026H1营收922.78亿/+1.3%、归母445.17亿/-1.95%），商务消费场景恢复偏慢"], "evidence": ["iFinD行情/估值/ROE/分红数据截至2026-10-23收盘，财务为FY2025年报（20251231）", "证券时报2026-04-17：贵州茅台上市以来首现业绩双下滑，2025年度拟派350.33亿", "21财经2026-08-19：茅台成收息股，2025年全年分红650.33亿占归母净利79%", "证券时报2026-08-14：2026H1营收922.78亿/+1.3%、归母445.17亿/-1.95%", "证券时报2026-04-09：2026-03-31飞天提价出厂价100元至1269元、自营零售价至1539元，被视为行业底部信号", "雪球/今日酒价2026-10-24：散瓶飞天批价跌破1800元（原箱1830、散瓶1780）"], "tier": "核心", "tier_reason": "近5年加权ROE 30-36%持续达标、毛利率91%、负债率极低、无治理硬伤、分红率提升至75-79%，PE/PB近10年分位均在10%以内；业绩随行业深度调整出现波动但护城河与现金牛属性未损，符合框架程度最高。", "missing_fields": []}, {"code": "000858.SZ", "name": "五粮液", "industry": "白酒", "cluster": "白酒/食品饮料", "data_date": "2026-10-23", "price": 73.86, "market_cap_yi": 2867.0, "pe_ttm": 21.91, "pb": 2.42, "dividend_yield_ttm": 6.98, "pe_pct_10y": 29.4, "pb_pct_10y": 3.68, "roe_5y": {"2021": 25.3, "2022": 25.28, "2023": 25.06, "2024": 23.35, "2025": 6.89}, "gross_margin_latest": 77.54, "gross_margin_trend": "稳定（长期75%上下，FY2025为77.54%）", "ocf_to_income": 2.51, "debt_ratio": 35.69, "bank_special": null, "dividend_buyback": "2025年度10派25.78元合计100.07亿；2025年度累计分红200.14亿、分红比例223.5%（因2025年归母净利大幅缩水至89.54亿，分红率被动抬高）；五粮液集团2026年5月公告拟增持30-50亿元、锁定期6个月；上市以来累计分红1364亿=募资38亿的36倍。来源：深交所利润分配公告2026-04-30、证券时报2026-05-06、上证报2026-05-06。", "understand": "浓香型白酒第二极，以普五（第八代）为核心、五粮春/尖庄为两翼，业务模式简单可懂；但2025年因'前期会计差错更正'对收入确认进行追溯调整（前三季度营收/净利分别调减303亿/154亿），报表可比性与短期可预测性被一次性打断。", "good": "品牌与窖池护城河仍在，FY2025毛利率77.54%未崩、OCF/经营净收益2.51显示回款显著好于账面利润；但2025年营收405.29亿/-54.55%、归母净利89.54亿/-71.89%、加权ROE从23.35%降至6.89%，属收入确认审慎化的一次性出清，而非日常经营崩盘。2026H1营收284.17亿/+20.9%、归母87.53亿/+89.3%（低基数），报表见底迹象明显。", "cheap": "PE(TTM)21.91倍对应出清后低基数利润，PB近10年分位仅3.68%；股息率TTM 6.98%、集团2026年5月增持30-50亿，产业资本背书与股东回报力度较强。", "moat": ["品牌定价权（浓香型）", "窖池与产能稀缺"], "risks": ["2025年会计差错更正涉及收入确认政策追溯调整、营收调减303亿/净利调减154亿，收入确认审慎性历史是治理层面的证伪点，需持续跟踪", "第八代普五流通价2026年10月约700-730元（京东原箱折合700、散瓶经销商报价730），与出厂价价差收窄，渠道利润承压"], "evidence": ["iFinD行情/估值/ROE/分红数据截至2026-10-23收盘，财务为FY2025年报", "21财经2026-05-05：2025年营收405.29亿、归母89.54亿，系对前期会计差错更正、谨慎性调整部分业务收入确认", "证券时报2026-05-06：调整后2025年营收-54.55%/归母-71.89%；集团斥资不低于30亿增持", "证券时报2026-08-29：2026H1营收284亿、普八代流通价回升至800元水平", "东方财富研报2026-08-30：2026H1营收/归母+20.9%/+89.3%，报表见底再启"], "tier": "观察", "tier_reason": "品牌护城河与现金流未坏、2026H1低基数恢复、高分红+集团增持；但2025年收入确认差错更正是框架下治理诚信层面的实质瑕疵，且业绩单年波动极大，需跟踪后续报表质量与普五价盘，暂列观察。", "missing_fields": ["是否股份回购注销未取到（分红工具未返回该字段，仅有增持计划证据）"]}, {"code": "000568.SZ", "name": "泸州老窖", "industry": "白酒", "cluster": "白酒/食品饮料", "data_date": "2026-10-23", "price": 69.99, "market_cap_yi": 1030.2, "pe_ttm": 13.72, "pb": 2.25, "dividend_yield_ttm": 8.25, "pe_pct_10y": 7.59, "pb_pct_10y": 0.88, "roe_5y": {"2021": 31.15, "2022": 33.32, "2023": 35.07, "2024": 30.44, "2025": 22.66}, "gross_margin_latest": 86.62, "gross_margin_trend": "稳定高位（FY2025为86.62%）", "ocf_to_income": 0.49, "debt_ratio": 23.0, "bank_special": null, "dividend_buyback": "2025全年累计分红85.01亿（中期19.99亿+年度65.02亿）、分红率78.48%；2024年度累计87.58亿、约占当年归母净利65%；2026年8月实施分配时因限制性股票回购注销调整总股本。来源：公司2025年度分红派息实施公告2026-08-19、中国金融信息网2026-08-24。", "understand": "以大单品国窖1573驱动的高端浓香白酒，业务结构简单清晰；但2026年推行'控量挺价'战略后收入确认节奏大幅波动，短期现金流与利润的可预测性下降。", "good": "国窖1573在千元价格带份额稳固（2026H1中高档酒收入占87.85%），FY2025毛利率86.62%、资产负债率仅23.00%；近5年加权ROE 31/33/35/30/23%仍处高位，但2025年已从35%回落至22.66%，2026H1营收104.72亿/-36.35%、归母43.39亿/-43.37%（Q2单季净利近-80%），为浓香龙头中下滑最深者。", "cheap": "PE(TTM)13.72倍、PE/PB近10年分位7.59%/0.88%（PB分位为9只中最低），股息率TTM 8.25%为9只中最高；2025年分红率78.48%提供收益底，毛估估估值对下行风险的定价较充分。", "moat": ["品牌定价权（国窖1573）", "窖池稀缺"], "risks": ["2026H1营收-36.35%/归母-43.37%、经营现金流净额-65.68%，控量挺价的阵痛幅度超五粮液、汾酒等同业", "52度国窖1573批价约825元（2026-08-26今日酒价），若继续下行将击穿千元价格带定位与品牌心智"], "evidence": ["iFinD行情/估值/ROE/分红数据截至2026-10-23收盘，财务为FY2025年报", "中国金融信息网2026-08-24：2025全年累计分红约85亿、分红率78.48%、全年股息率超6%", "东方财富2026-08-25：2026H1营收104.72亿/-36.35%、归母43.39亿/-43.37%、经营现金流-65.68%", "新华网2026-04-29：2026Q1营收80.25亿、归母37.08亿", "新浪财经2026-08-27：控量挺价后52度/38度国窖批价825/625元，价格体系维持"], "tier": "观察", "tier_reason": "品牌护城河、高毛利、极低PB分位与8.25%股息率符合框架的部分清晰；但2026H1业绩下滑幅度为浓香龙头中最大、控量挺价战略有效性待验证，暂列观察而非核心。", "missing_fields": []}, {"code": "600809.SH", "name": "山西汾酒", "industry": "白酒", "cluster": "白酒/食品饮料", "data_date": "2026-10-23", "price": 112.6, "market_cap_yi": 1373.7, "pe_ttm": 13.49, "pb": 3.61, "dividend_yield_ttm": 5.83, "pe_pct_10y": 1.43, "pb_pct_10y": 3.39, "roe_5y": {"2021": 42.04, "2022": 44.74, "2023": 43.06, "2024": 39.68, "2025": 33.48}, "gross_margin_latest": 74.85, "gross_margin_trend": "稳定（FY2025为74.85%，2026H1为75.40%）", "ocf_to_income": 0.55, "debt_ratio": 28.74, "bank_special": null, "dividend_buyback": "2025年度10派65.6元合计80.03亿、分红率65.35%（2025年度累计口径）；2024年度分红比例35.87%、2023年51.07%、2025年提升至65.35%。来源：证券时报2026-07-26、iFinD分红比例序列。", "understand": "清香型白酒绝对龙头，青花（次高端）+玻汾（大众光瓶）双百亿单品，处于全国化2.0精耕期，业务模式简单、渠道与品牌逻辑清晰，现金流可预测性在白酒板块中相对较强。", "good": "近5年加权ROE 42.04/44.74/43.06/39.68/33.48%为9只中最高且持续达标，FY2025毛利率74.85%、资产负债率28.74%；2025年行业普遍下滑中仍实现营收387.18亿/+7.52%，2026H1经营活动现金流净额同比两位数增长，分红率由35.87%提升至65.35%。", "cheap": "PE(TTM)13.49倍、PE/PB近10年分位1.43%/3.39%处于2016年以来最低区间，股息率TTM 5.83%；毛估估对应未来利润走向的估值压力已很小。", "moat": ["清香品类垄断", "品牌全国化", "大单品结构"], "risks": ["2025年归母净利122.46亿仅+0.03%、2026H1营收210.44亿（同比约-12%）/归母64.39亿（约-24%），青花30及以上高双位数下滑，次高端价盘承压", "长江以南等省外市场全国化突破进度与青花20基本盘的守价能力需跟踪"], "evidence": ["iFinD行情/估值/ROE/分红数据截至2026-10-23收盘，财务为FY2025年报", "证券时报2026-04-23：2025年营收387.18亿/+7.52%、归母122.46亿/+0.03%，逆势双增长", "证券时报2026-07-26：2025年度10派65.6元合计80.03亿", "中国新闻网2026-09-02：2026H1营收210.44亿、归母64.39亿", "新浪财经2026-09-18：控货去库下青花系列整体下滑低双位数、青花20/25持平微增、经营现金流韧性"], "tier": "核心", "tier_reason": "近5年ROE持续33-45%为样本最高、毛利率75%、负债率低、分红率提升至65%、无治理硬伤，PE/PB分位为全场最低区间；2026H1随行业β下滑但护城河与现金流韧性未损，符合框架程度仅次于茅台。", "missing_fields": ["是否股份回购注销未取到（分红工具未返回该字段）"]}, {"code": "600887.SH", "name": "伊利股份", "industry": "乳制品", "cluster": "白酒/食品饮料", "data_date": "2026-10-23", "price": 28.19, "market_cap_yi": 1783.1, "pe_ttm": 17.61, "pb": 3.32, "dividend_yield_ttm": 4.9, "pe_pct_10y": 20.94, "pb_pct_10y": 24.91, "roe_5y": {"2021": 25.59, "2022": 19.23, "2023": 20.2, "2024": 15.81, "2025": 20.87}, "gross_margin_latest": 34.58, "gross_margin_trend": "稳定（FY2025为34.58%，较2024年33.88%小幅提升）", "ocf_to_income": 1.18, "debt_ratio": 61.51, "bank_special": null, "dividend_buyback": "2025年度每股派0.90元合计56.93亿，加中期分红后全年现金分红+回购合计占归母净利77.6%（公司口径，ROIC 12.3%）；2024年度分红比例91.29%、2023年73.25%。来源：公司2025年报2026-04-30、公司英文业绩材料。", "understand": "亚洲乳业龙头，液态奶+奶粉+冷饮业务简单可懂，但乳制品行业总量见顶、原奶周期波动，未来现金流画像是低速成熟现金牛而非高成长。", "good": "渠道与品牌矩阵规模壁垒深厚，FY2025毛利率34.58%、OCF/经营净收益1.18匹配良好；近5年加权ROE 25.59/19.23/20.20/15.81/20.87%（2024年低点84.53亿归母后回升）；文化上2025年分红+回购合计占归母77.6%，股东回报导向明确。资产负债率61.51%以经营性占款（渠道/奶款）为主，属乳业特性而非有息杠杆。", "cheap": "PE(TTM)17.61倍、PE/PB近10年分位20.94%/24.91%处于中低分位，股息率TTM 4.90%；作为低速现金牛，毛估估估值对应长期国债收益率具备一定吸引力。", "moat": ["渠道规模壁垒", "品牌矩阵", "原奶产业链掌控"], "risks": ["2024年归母净利曾降至84.53亿（含减值）、2026H1再计提商誉减值（公司称属会计减值不涉现金流出），资产质量需持续跟踪", "乳制品行业总量增长停滞，2026H1营收644.9亿/+4.13%、剔除一次性影响核心经营利润83.8亿/+10%，增长靠结构升级"], "evidence": ["iFinD行情/估值/ROE/分红数据截至2026-10-23收盘，财务为FY2025年报", "公司2025年报2026-04-30：营收1159.31亿、归母115.65亿，年度每股派0.90元", "公司英文业绩材料：2025年分红+回购占归母净利77.6%、ROIC 12.3%", "证券日报2026-08-27：2026H1营收644.9亿/+4.13%、核心经营利润+10%、对相关资产计提减值"], "tier": "观察", "tier_reason": "龙头地位、现金流与高股东回报符合框架，但行业总量见顶、ROE较2021年明显下台阶、且连续两年出现减值事件，增长确定性弱于白酒龙头，暂列观察。", "missing_fields": []}, {"code": "603288.SH", "name": "海天味业", "industry": "调味品", "cluster": "白酒/食品饮料", "data_date": "2026-10-23", "price": 34.53, "market_cap_yi": 2017.9, "pe_ttm": 27.58, "pb": 5.17, "dividend_yield_ttm": 2.32, "pe_pct_10y": 2.35, "pb_pct_10y": 4.31, "roe_5y": {"2021": 31.63, "2022": 25.52, "2023": 20.72, "2024": 21.76, "2025": 19.59}, "gross_margin_latest": 40.22, "gross_margin_trend": "先降后升（2024年37.00%→2025年40.22%回升）", "ocf_to_income": 0.94, "debt_ratio": 19.82, "bank_special": null, "dividend_buyback": "2025年度现金分红比率112.95%、累计派现近70亿；2026年6月A+H首次同步回购并注销，打出'分红+注销'组合拳。2024年度分红比例75.24%、2023年65.06%。来源：上海证券报2026-06-26、iFinD分红比例序列。", "understand": "调味品（酱油/蚝油/酱料）绝对龙头，餐饮+B端供应链与C端家庭双渠道，业务模式简单可懂；2021-2023年经历添加剂舆情与餐饮疲软冲击后，2025年营收/净利双创历史新高，走出调整期。", "good": "品牌心智+渠道规模护城河深厚，FY2025毛利率40.22%（较2024年37.00%回升3.2pct）、资产负债率仅19.82%、OCF/经营净收益0.94匹配良好；但近5年加权ROE 31.63/25.52/20.72/21.76/19.59%较2021年峰值明显下台阶，反映行业需求中枢下移与竞争加剧。", "cheap": "PE(TTM)27.58倍绝对值在样本中偏高，但PE/PB近10年分位仅2.35%/4.31%（历史估值极高后的消化）；2025年分红率112.95%+A+H回购注销，股东回报力度显著加大。", "moat": ["品牌心智", "渠道规模", "餐饮供应链绑定"], "risks": ["近5年ROE从31.63%回落至19.59%，估值分位低部分源于历史高估值消化，PE绝对值仍不低", "调味品行业总量疲软，折扣店/社区团购等新兴渠道对传统经销体系的冲击持续"], "evidence": ["iFinD行情/估值/ROE/分红数据截至2026-10-23收盘，财务为FY2025年报", "上海证券报2026-06-26：2025年营收288.73亿/+7.32%、归母70.38亿/+10.95%双创历史新高，年度分红率112.95%", "公司官网：2025年度报告2026-04-08、2026年半年报2026-08-27", "iFinD分红比例序列：2023年65.06%/2024年75.24%/2025年66.45%（年度口径）"], "tier": "观察", "tier_reason": "龙头护城河与资产负债表健康、2025年业绩创新高且分红+回购注销力度大；但ROE较峰值下台阶、PE绝对值仍高，成长中枢下移，暂列观察。", "missing_fields": []}, {"code": "600298.SH", "name": "安琪酵母", "industry": "酵母/食品添加剂", "cluster": "白酒/食品饮料", "data_date": "2026-10-23", "price": 37.19, "market_cap_yi": 322.7, "pe_ttm": 19.85, "pb": 2.59, "dividend_yield_ttm": 1.48, "pe_pct_10y": 3.17, "pb_pct_10y": 5.33, "roe_5y": {"2021": 20.54, "2022": 16.47, "2023": 13.03, "2024": 12.83, "2025": 13.51}, "gross_margin_latest": 24.71, "gross_margin_trend": "先降后稳（2024年23.52%→2025年24.71%小幅回升）", "ocf_to_income": 1.52, "debt_ratio": 49.34, "bank_special": null, "dividend_buyback": "2025年度10派5.5元、分红比例30.91%；2024年36.05%、2023年33.76%，分红率长期30%上下，显著低于白酒与调味品龙头。来源：公司2025年报、iFinD分红比例序列。", "understand": "国内酵母绝对龙头（全球第三），酵母及酵母衍生品的规模化生产，业务可懂；但本质是成本驱动型制造业（糖蜜+能源占比高），产品定价权弱于品牌消费品。", "good": "国内市占率领先+海外产能布局（2025年海外营收68.48亿/+19.88%），OCF/经营净收益1.52、现金流良好；但近5年加权ROE 20.54/16.47/13.03/12.83/13.51%持续低于框架15%门槛（2023-2025约13%），毛利率仅24.71%，盈利能力对原料成本高度敏感。", "cheap": "PE(TTM)19.85倍、PE/PB近10年分位3.17%/5.33%处于低位，糖蜜价格下行带来2025年盈利弹性（归母15.44亿/+16.60%）；但股息率TTM仅1.48%、分红率约31%，股东回报力度弱。", "moat": ["规模成本优势", "全球产能布局"], "risks": ["近5年ROE多数年度低于15%框架门槛（2023-2025约13%），不符合'长期高ROE'量化门槛", "糖蜜与能源价格波动直接侵蚀毛利；海外产能面临地缘与汇率风险"], "evidence": ["iFinD行情/估值/ROE/分红数据截至2026-10-23收盘，财务为FY2025年报", "财联社2026-04：2025年营收167.29亿/+10.08%、归母15.44亿/+16.60%，海外营收68.48亿/+19.88%", "证券之星2026-04-07：2025年度10派5.5元", "信达证券2026-04-02：糖蜜红利有望持续释放"], "tier": "观察", "tier_reason": "成本周期改善+海外增长带动2025年利润双位数回升、估值分位低；但ROE中枢已从20%下台阶至13%左右、持续低于框架15%门槛，定价权弱于品牌消费，暂列观察并标注该瑕疵。", "missing_fields": ["是否股份回购注销未取到（分红工具未返回该字段）"]}, {"code": "000895.SZ", "name": "双汇发展", "industry": "肉制品", "cluster": "白酒/食品饮料", "data_date": "2026-10-23", "price": 23.73, "market_cap_yi": 822.2, "pe_ttm": 16.16, "pb": 3.94, "dividend_yield_ttm": 3.37, "pe_pct_10y": 20.95, "pb_pct_10y": 13.44, "roe_5y": {"2021": 21.8, "2022": 25.43, "2023": 23.83, "2024": 23.81, "2025": 24.1}, "gross_margin_latest": 18.05, "gross_margin_trend": "低位平稳（FY2025为18.05%）", "ocf_to_income": 1.14, "debt_ratio": 45.32, "bank_special": null, "dividend_buyback": "2025全年累计分红50.24亿、分红率98.42%（年度10派8元=27.72亿+中期分红）；媒体公开统计近10年累计分红约517亿、留存收益趋近于零。2024年度分红比例52.08%、2023年47.99%。来源：上证报2026-03-24、新浪财经2026-10-10、iFinD分红比例序列。", "understand": "国内肉制品（高温肉制品+生鲜冻品）龙头，依托万洲国际全球猪肉产业链，业务模式简单但增长停滞——2025年营收594.60亿已连降五年。", "good": "品牌+屠宰规模+冷鲜渠道网络壁垒稳固，近5年加权ROE稳定21.8-25.4%（高分红压低净资产推高ROE），OCF/经营净收益1.14；但FY2025毛利率仅18.05%，本质是低毛利走量的现金生意。", "cheap": "PE(TTM)16.16倍、PE/PB近10年分位20.95%/13.44%，股息率TTM 3.37%；2025年分红率98.42%近乎全分，是典型收息现金牛画像。", "moat": ["屠宰规模成本优势", "冷鲜渠道网络"], "risks": ["营收连降五年（2025年594.60亿），增长引擎缺失", "媒体公开质疑'10年分红约517亿、留存趋近于零'，控股股东（万洲）利益导向与中小股东长期利益一致性需跟踪"], "evidence": ["iFinD行情/估值/ROE/分红数据截至2026-10-23收盘，财务为FY2025年报", "上证报2026-03-24：2025年归母51.05亿/+2.32%，全年累计分红50.24亿、分红率98.42%", "新浪财经2026-10-10：营收连降五年、10年分红约517亿、留存趋近于零的公开质疑", "公司2025年度权益分派实施公告2026-04-21：10派8元合计27.72亿"], "tier": "观察", "tier_reason": "现金牛属性、ROE常年稳定24%左右符合框架；但营收连降五年、近全分红政策引发的治理争议，使其更接近高股息收息资产而非成长型标的，暂列观察。", "missing_fields": ["是否股份回购注销未取到（分红工具未返回该字段）"]}, {"code": "600132.SH", "name": "重庆啤酒", "industry": "啤酒", "cluster": "白酒/食品饮料", "data_date": "2026-10-23", "price": 37.71, "market_cap_yi": 182.5, "pe_ttm": 15.71, "pb": 11.53, "dividend_yield_ttm": 3.18, "pe_pct_10y": 0.26, "pb_pct_10y": 19.82, "roe_5y": {"2021": 99.69, "2022": 69.25, "2023": 67.05, "2024": 60.17, "2025": 81.68}, "gross_margin_latest": 50.88, "gross_margin_trend": "稳定（FY2025为50.88%）", "ocf_to_income": 0.83, "debt_ratio": 73.24, "bank_special": null, "dividend_buyback": "2025全年合计派现12.1亿、分红率98.3%（年度每股1.20元=5.81亿+中期分红）；2023年度分红比例曾达101.39%。来源：公司2025年报2026-03、新浪财经2026-03-12。", "understand": "嘉士伯在华旗舰（重庆/乌苏/乐堡/1664等品牌组合），高端化啤酒龙头，业务简单可懂；但啤酒行业总量见顶，未来画像是'存量高端化+高分红'的成熟现金牛。", "good": "区域渠道垄断+高端品牌组合护城河，FY2025毛利率50.88%；近5年加权ROE 99.69/69.25/67.05/60.17/81.68%（高分红压低净资产所致，非真实回报率），2025年归母净利12.31亿/+10.43%；分红率98.3%近乎全分。资产负债率73.24%含嘉士伯体系内部往来与经营性负债。", "cheap": "PE(TTM)15.71倍、PE近10年分位0.26%处于样本最低；但PB 11.53倍（分位19.82%）绝对值高，系高分红导致净资产极小；2025年营收147.22亿仅+0.53%、扣非归母11.88亿/-2.78%，成长性有限。", "moat": ["区域渠道垄断", "高端品牌组合"], "risks": ["2025年扣非归母-2.78%、销量299.52万千升微增，高端化放缓、行业总量见顶", "PB绝对值11.53倍，高分红政策若因资本开支或母公司诉求而不可持续，估值缺乏净资产支撑"], "evidence": ["iFinD行情/估值/ROE/分红数据截至2026-10-23收盘，财务为FY2025年报", "上证报2026-03-10：2025年营收147.22亿/+0.53%、归母12.31亿/+10.43%", "财联社2026-03：2025年扣非归母11.88亿/-2.78%、销量299.52万千升微增、2026年对行业谨慎乐观", "新浪财经2026-03-12：2025全年分红12.1亿、分红率98.3%"], "tier": "观察", "tier_reason": "区域垄断+高端品牌+近全分红符合现金牛框架；但行业总量见顶、扣非利润已现负增长、PB绝对值高，成长空间有限，暂列观察。", "missing_fields": ["是否股份回购注销未取到（分红工具未返回该字段）"]}, {"code": "000333.SZ", "name": "美的集团", "industry": "白色家电/多元化制造", "cluster": "家电/消费品牌", "data_date": "2026-10-23", "price": 85.59, "market_cap_yi": 6530.8, "pe_ttm": 14.72, "pb": 3.08, "dividend_yield_ttm": 5.02, "pe_pct_10y": 52.53, "pb_pct_10y": 45.36, "roe_5y": {"2021": 24.09, "2022": 22.21, "2023": 22.23, "2024": 21.29, "2025": 19.7}, "gross_margin_latest": 26.39, "gross_margin_trend": "提升后企稳（2021年22.48%升至2024年26.42%，2025年26.39%基本持平）", "ocf_to_income": 1.11, "debt_ratio": 61.17, "bank_special": null, "dividend_buyback": "2025年度现金分红293.64亿元（每10股派43元，年度派息率约73%，iFinD财务指标）；2024年9月下旬以来累计回购金额超524亿元（A股上市公司第一），本轮回购用途已变更为依法注销减少注册资本；2025年另推出50-100亿元、15-30亿元两项A股回购计划（来源：深交所2026-03-31董事会工作报告；头条/九派财经2026-10报道）。", "understand": "业务以白色家电与暖通空调为核心，叠加机器人与自动化、新能源、医疗、楼宇科技等ToB第二曲线，整体仍属可理解的制造+品牌生意。白电需求随更新周期与出海展开，未来现金流大致可预测；ToB板块虽多但定位清晰（核心做厚、问题业务果断处置），不构成看不懂的纯概念。", "good": "护城河来自规模制造、全品类品牌矩阵与全球渠道，OBM（自有品牌）收入占海外比重已从2017年前的6-7%升至40%以上。近5年加权ROE维持在19.7%-24.1%的高位（2025年19.7%为五年最低，呈缓降）；毛利率从22.5%提升至26.4%后企稳；2025年经营现金流净额533.5亿元/经营活动净收益479.1亿元=1.11，现金匹配良好。企业文化聚焦主业、长期主义，股东回报在A股属第一梯队（大额分红+持续回购注销）。", "cheap": "截至2026-10-23，PE(TTM)14.7倍、PB3.08倍，PE近10年分位52.5%、PB分位45.4%，处历史中枢偏上而非深度低估；对应约6531亿市值、TTM股息率约5%。以其白电+暖通的稳定盈利与全球化利润走向，毛估估估值并不便宜，但也未明显透支，更多是合理偏中性位置（仅为估值位置描述，非买卖建议）。", "moat": ["规模制造成本优势", "全品类品牌矩阵", "全球化自有品牌渠道", "持续回购注销的股东回报"], "risks": ["近5年ROE逐年缓降（24.09%→19.70%），若继续下行将削弱高回报逻辑", "2026年4月起美国对进口冰箱、洗衣机加征232关税并改按整件计征，公司转向北美本地产能，关税与地缘为持续外部变量（新浪财经2026-10-08）", "ToB新业务（机器人、新能源、医疗、楼宇）资本开支大，盈利兑现度需逐期验证"], "evidence": ["2025年报：营收4585.02亿元(+12.1%)、归母净利439.45亿元(+14.0%)，海外收入1959亿元(+16%)（公司2025年报，2026-03-31）", "OBM占海外收入比重升至40%以上，ToB收入1228亿元(+17.5%)，收购Arbonia、东芝电梯中国、锐珂医疗国际（公司致股东信2026-08）", "累计回购超524亿元并变更为注销减资，A股回购规模第一（头条/九派财经2026-10-24）", "美国232关税抬升出口成本，美的以合资方式在北美本地产冰箱洗衣机（新浪财经2026-10-08）"], "tier": "核心", "tier_reason": "业务可懂、ROE长期高位、现金流与股东回报第一梯队，符合框架核心标准；ROE缓降与海外关税为需持续跟踪的瑕疵，但未动摇商业模式。", "missing_fields": []}, {"code": "000651.SZ", "name": "格力电器", "industry": "空调", "cluster": "家电/消费品牌", "data_date": "2026-10-23", "price": 37.23, "market_cap_yi": 2085.4, "pe_ttm": 7.48, "pb": 1.4, "dividend_yield_ttm": 8.06, "pe_pct_10y": 17.58, "pb_pct_10y": 0.76, "roe_5y": {"2021": 21.34, "2022": 24.19, "2023": 26.53, "2024": 25.42, "2025": 20.3}, "gross_margin_latest": 29.81, "gross_margin_trend": "提升后企稳（2021年24.28%升至2023年30.57%，2024/2025年约29.4%-29.8%）", "ocf_to_income": 1.42, "debt_ratio": 61.73, "bank_special": null, "dividend_buyback": "2025年度现金分红167.87亿元（每10股派30元，年度派息率约58%，iFinD财务指标）；2025年中期每10股派10元共约55.85亿元；上市以来累计分红已超1776亿元；公司披露'质量回报双提升'行动，承诺通过现金分红+股份回购提升回报（来源：上海证券报2026-02-25；深交所2026-04-29公告）。", "understand": "主业高度集中于家用空调（含暖通），生意本身简单可懂——空调的更新与替换需求可大致预判。但公司同时铺开工业机器人、数控机床、半导体、储能等多元化战线，这些业务盈利贡献与战略定位长期不够清晰，增加了'买下整家公司长期持有'的理解难度。", "good": "空调品类具备品牌与渠道沉淀，近5年加权ROE仍达20.3%-26.5%（2025年20.3%明显回落）；毛利率约29.8%、2025年经营现金流/经营净收益=1.42，现金创造强；TTM股息率约8%、PB近10年分位仅0.76%，股东回报意愿强。但渠道改革仍在阵痛：2024-2025年累计削减经销商层级约20%-30%，线上乱价冲击线下，公司不得不按线下销售额5%给予渠道通补，护城河的稳固性低于同行。", "cheap": "PE(TTM)7.48倍、PB1.40倍，PE近10年分位17.6%、PB分位0.76%，估值处于历史极低区域，叠加约8%的TTM股息率，从毛估估看价格本身具备吸引力。但低估值对应的是市场对其空调单品类依赖、渠道未定与多元化前景的折价，便宜程度需以盈利能否企稳为前提（仅为估值位置描述，非买卖建议）。", "moat": ["空调品牌与技术沉淀", "高分红现金回报", "强经营现金流"], "risks": ["空调单品类依赖度高，2025年公司自述经营业绩不够理想（投资者关系记录2026-05-28）", "渠道改革未完全走出阵痛，线上乱价、线下通补政策反映渠道体系仍在修复（新浪财经2026-08-31；上证报2026-05-07）", "多元化（机器人/半导体/储能/数控机床）长期盈利贡献不清晰，偏离聚焦主业原则", "2026年半年报拟中期暂不派现，分红节奏存在阶段性波动"], "evidence": ["2026Q1营收430.80亿元(+3.46%)、归母净利60.82亿元(+3.01%)，创一季度历史新高（上证报2026-04-29）", "2024-2025累计削减经销商层级20%-30%，直营/类直营占比由约15%升至25%-30%，库存周转由约80天压至60-70天（新浪财经2026-08-31）", "2026年7月行业率先推出不限空调品牌以旧换新（新华网2026-07-07）", "2025年中期分红55.85亿元，上市累计分红超1776亿元（上证报2026-02-25）"], "tier": "观察", "tier_reason": "高股息与极低估值、强现金流符合框架方向，但空调单品类依赖、渠道改革未定、多元化不聚焦，护城河稳固性与'聚焦主业产品导向'存在瑕疵，归入观察并跟踪渠道与盈利企稳。", "missing_fields": []}, {"code": "600690.SH", "name": "海尔智家", "industry": "白色家电/全球化", "cluster": "家电/消费品牌", "data_date": "2026-10-23", "price": 19.65, "market_cap_yi": 1827.2, "pe_ttm": 10.24, "pb": 1.54, "dividend_yield_ttm": 4.54, "pe_pct_10y": 0.76, "pb_pct_10y": 1.0, "roe_5y": {"2021": 17.29, "2022": 16.81, "2023": 16.85, "2024": 17.7, "2025": 16.98}, "gross_margin_latest": 26.66, "gross_margin_trend": "2024年起下滑（2021-2023年约31.2%-31.5%，2024年27.80%，2025年26.66%）", "ocf_to_income": 1.28, "debt_ratio": 57.41, "bank_special": null, "dividend_buyback": "2025年度现金分红71.29亿元（每10股派11.607元，年度派息率约53%，并提升至55%口径，iFinD/公司披露）；已制定2026-2028股东回报规划：2026年派息率不低于58%、2027/2028年不低于60%；2023-2026累计回购股份中7454万股已安排注销，新一轮30-60亿元A股回购推进中，D股/H股同步以注销为目的回购（来源：海尔官网2026-04-28/06-24；中国金融信息网2026-10-19）。", "understand": "以白电（冰洗空）为核心，通过收购GE Appliances、Candy等形成全球多品牌矩阵，叠加国内卡萨帝高端线。生意本质是家电制造与品牌运营，可理解；海外收入占比高、需在多国经营，复杂度高于纯内销龙头，但本地化制造与品牌体系已成型。", "good": "护城河是稀缺的全球自主品牌组合（北美GE Appliances稳定盈利并提升份额、欧洲进入前三、国内白电线上线下双第一）与卡萨帝高端化能力。近5年加权ROE稳定在16.8%-17.7%；2025年经营现金流/经营净收益=1.28；股东回报机制明确加码（分红率提升+A股/D股/H股多路回购注销）。需注意毛利率自2024年起由约31.5%降至26.7%，反映海外并表结构、关税与成本的压力。", "cheap": "PE(TTM)10.2倍、PB1.54倍，PE近10年分位仅0.76%、PB分位1.0%，估值处历史最低区间附近；对应约1827亿市值、TTM股息率约4.5%（公司口径当前股息率超5%）。以其全球多品牌的利润底盘与持续提升的派息率，毛估估当前价格具备安全边际；主要不确定性在北美关税与毛利率能否企稳（仅为估值位置描述，非买卖建议）。", "moat": ["全球多品牌矩阵（GE/Candy/卡萨帝）", "本土化制造与全球渠道", "明确提升的分红+回购注销机制"], "risks": ["毛利率自2024年连续两年下滑（31.5%→26.7%），若持续将压制盈利质量", "北美市场受暴风雪、关税与消费信心压制，2026Q1海外收入同比-3.2%、北美行业需求约-10%（东方财富研报2026-04-28；公司2026一季报）", "海外多市场经营，地缘与汇率波动直接影响利润"], "evidence": ["2026Q1国内经营利润逆势增长，海外收入同比-3.2%主要受北美拖累，欧洲与新兴市场对冲（海尔官网2026-04-28）", "2025年度派息率提升至55%，2026-2028规划不低于58%/60%/60%（中国金融信息网2026-10-19；海尔官网2026-06-24）", "2023-2026累计7454万股已注销，新一轮30-60亿元A股回购及D股/H股注销式回购推进（海尔官网2026-04-28；上证报2026-10-17）", "GE Appliances在北美行业下滑中保持盈利并提升份额，2026Q2美元口径转正增长（经济参考网2026-08-28）"], "tier": "核心", "tier_reason": "全球多品牌护城河稀缺、ROE长期稳定达标、现金流良好、分红与回购注销机制坚决；毛利率下滑与北美关税为需跟踪的风险，但不改变其商业模式质量，列入核心。", "missing_fields": []}, {"code": "002032.SZ", "name": "苏泊尔", "industry": "小家电", "cluster": "家电/消费品牌", "data_date": "2026-10-23", "price": 41.78, "market_cap_yi": 333.0, "pe_ttm": 16.62, "pb": 6.1, "dividend_yield_ttm": 6.29, "pe_pct_10y": 3.31, "pb_pct_10y": 31.62, "roe_5y": {"2021": 26.81, "2022": 27.89, "2023": 34.62, "2024": 37.27, "2025": 35.08}, "gross_margin_latest": 24.87, "gross_margin_trend": "先升后稳（2021年23.00%升至2023年26.30%，2024/2025年约24.7%-24.9%）", "ocf_to_income": 1.18, "debt_ratio": 52.9, "bank_special": null, "dividend_buyback": "2025年度现金分红20.96亿元（每10股派26.3元），分红率约99.95%，接近将当年归母净利全部分配；控股股东SEB集团按持股比例分走约83%（来源：公司2025年报摘要2026-04-03；上证报2026-04-04；证券之星2026-04-10）。", "understand": "主营明火炊具与厨房小家电，是典型的大众耐用消费品，品牌+渠道生意简单可懂，现金流可预测。但公司为法国SEB集团控股的在华平台，外销主要承接SEB及其他海外客户订单，经营独立性与再投资空间受大股东战略约束。", "good": "炊具与小家电具备品牌和线下渠道护城河，近5年加权ROE高达26.8%-37.3%（2025年35.1%），2025年经营现金流/经营净收益=1.18，现金质量好。高分红率（约100%）对股东友好。但2025年出现增收不增利：归母净利约20.97亿元、扣非净利同比-7.28%，且被市场质疑研发投入偏低、更像大股东的'分红提款机'，成长性与产品投入的长期主义存疑。", "cheap": "PE(TTM)16.6倍、PB6.10倍，PE近10年分位3.3%（历史低位）但PB分位31.6%；TTM股息率约6.3%。PB偏高主要因长期高分红压低净资产。以其稳定但已开始下滑的盈利，毛估估价格反映了增长见顶预期；高股息是主要吸引力，但需接受成长有限、回报主要靠分红（仅为估值位置描述，非买卖建议）。", "moat": ["炊具/小家电品牌", "线下渠道网络", "高分红现金回报"], "risks": ["2025年增收不增利，归母与扣非净利双双下滑（扣非-7.28%），增长动能减弱（新浪财经2026-04-08）", "研发投入偏低、近乎100%分红，被质疑为大股东分红平台，再投资与长期增长受限", "外销依赖SEB等海外客户订单，2025年外销需求略降，受海外去库存与关税间接影响", "PB6.1倍在板块内偏高，高分红后净资产小、估值对盈利下滑敏感"], "evidence": ["2025年营收227.72亿元、归母净利20.97亿元，扣非净利19.14亿元(-7.28%)（公司2025年报；同花顺财报数据）", "拟每10股派26.3元共20.96亿元，占归母净利约99.95%，实控人SEB分走约83%（上证报2026-04-04）", "外销因SEB及其他外销客户需求略减而小幅下降（公司2025年报摘要2026-04-03）", "市场质疑研发投入低迷、沦为大股东分红提款机（新浪财经2026-04-08）"], "tier": "观察", "tier_reason": "品牌渠道与极高ROE、高分红符合框架，但盈利已开始下滑、近乎全额分红反映再投资意愿弱、独立性受外资控股约束，长期成长与产品导向存疑，归入观察。", "missing_fields": []}, {"code": "002508.SZ", "name": "老板电器", "industry": "厨电", "cluster": "家电/消费品牌", "data_date": "2026-10-23", "price": 16.1, "market_cap_yi": 152.1, "pe_ttm": 13.55, "pb": 1.31, "dividend_yield_ttm": 6.21, "pe_pct_10y": 22.03, "pb_pct_10y": 2.41, "roe_5y": {"2021": 15.78, "2022": 17.21, "2023": 16.78, "2024": 14.44, "2025": 10.64}, "gross_margin_latest": 50.19, "gross_margin_trend": "高位小幅回落（2021年52.35%，2024年49.66%，2025年50.19%）", "ocf_to_income": 1.29, "debt_ratio": 32.75, "bank_special": null, "dividend_buyback": "2025年度合计每10股派10元（年末每10股派5元+已实施中期分红），总分红约9.5亿元，分红率约75.2%（来源：公司2025年报/利润分配预案；证券之星2026年）。", "understand": "主营吸油烟机、燃气灶等厨电，生意本身简单，但需求高度绑定新房竣工与家装后周期。房地产持续调整使未来装机需求的可预测性下降——不再是一个能'10年不上市睡好觉'的稳定现金流模型。", "good": "厨电品类仍有品牌力，毛利率约50%、2025年经营现金流/经营净收益=1.29、资产负债率仅32.8%，财务结构稳健、高分红（派息率约75%）。但商业模式正经历压力：近5年加权ROE由15.78%一路降至10.64%，已跌破框架15%门槛；2025年上市以来首次营收负增长（-9.78%）、净利-20.38%，属品牌仍在但主业量价齐缩的阶段。", "cheap": "PE(TTM)13.6倍、PB1.31倍，PE近10年分位22%、PB分位2.4%，估值已大幅回落；TTM股息率约6.2%。低估值反映了地产下行的悲观预期。毛估估价格不贵，但便宜的前提是盈利能在地产企稳后止跌；若竣工需求继续走弱，低PE可能是'价值陷阱'（仅为估值位置描述，非买卖建议）。", "moat": ["厨电品牌力", "稳健资产负债表", "高分红"], "risks": ["近5年ROE逐年下滑至10.64%，已破15%门槛，且2025年营收(-9.78%)、净利(-20.38%)双双负增长，为上市以来首次（新浪财经2026-08-24）", "需求高度绑定地产竣工，国补退坡后回归基本面承压，2026Q1营收仍同比-5.46%", "行业竞争加剧，厨电整体承压，第二曲线（水家电/集成烹饪）尚未形成对冲", "管理层换帅，新战略与渠道变革效果待验证"], "evidence": ["2025年营收101.16亿元(-9.78%)、归母净利12.56亿元(-20.38%)，上市首次营收负增长（上证报2026-04-30；新浪财经2026-08-24）", "受房地产持续调整与国补边际效应减弱影响，厨电市场承压更明显（公司2025年度董事会工作报告2026-04-28）", "2026Q1营收19.63亿元(-5.46%)、归母净利3.07亿元，延续下滑（证券之星2026年）", "2025全年合计每10股派10元，总分红约9.5亿元、分红率75.2%（公司利润分配预案）"], "tier": "观察", "tier_reason": "品牌与现金质量仍在、高分红，但ROE跌破门槛、主业连续负增长且深度绑定地产后周期，长期现金流可预测性下降，作为弱周期/结构性下行标的归入观察，需以竣工数据与盈利止跌为证伪/证实点。", "missing_fields": []}, {"code": "603899.SH", "name": "晨光股份", "industry": "文具/办公集采", "cluster": "家电/消费品牌", "data_date": "2026-10-23", "price": 21.58, "market_cap_yi": 197.6, "pe_ttm": 14.76, "pb": 2.27, "dividend_yield_ttm": 4.63, "pe_pct_10y": 0.75, "pb_pct_10y": 3.14, "roe_5y": {"2021": 26.82, "2022": 19.6, "2023": 20.97, "2024": 16.64, "2025": 14.56}, "gross_margin_latest": 18.36, "gross_margin_trend": "持续下滑（2021年23.21%降至2025年18.36%）", "ocf_to_income": 1.57, "debt_ratio": 45.36, "bank_special": null, "dividend_buyback": "2025年度每10股派10元，现金分红9.16亿元，分红率约69.9%（较2023年48%明显提升，iFinD财务指标）；2026年5月董事长提议回购公司股份（来源：公司2025年报/权益分派公告2026-04；晨光文具公告列表2026-06-02）。", "understand": "主营文具（书写工具、学生文具），通过覆盖校园与办公的零售网络销售，生意简单、品牌与渠道可理解。近年拓展办公直销（集采）与九木杂物社等新曲线，业务可懂但增长逻辑从'单品类品牌'转向'多渠道平台'。", "good": "文具主业有品牌与分销网络护城河，现金流优秀——2025年经营现金流/经营净收益=1.57，资产负债率45%左右，分红率提升至约70%并启动回购。但盈利质量持续走弱：近5年加权ROE由26.82%降至14.56%（2025年已略破15%门槛），毛利率由23.2%一路降至18.4%，主要受低毛利的办公直销集采占比提升与传统文具主业2025年收入-5%拖累。", "cheap": "PE(TTM)14.8倍、PB2.27倍，PE近10年分位仅0.75%、PB分位3.1%，估值处历史最低区域；TTM股息率约4.6%。以其品牌渠道与稳定现金，毛估估价格已较充分反映主业增长见顶与毛利率承压；向上修复需看新业务（核心品类/集采）能否稳住盈利（仅为估值位置描述，非买卖建议）。", "moat": ["文具品牌", "校园/办公分销网络", "强经营现金流", "提升中的分红回购"], "risks": ["近5年ROE降至14.56%、毛利率降至18.36%，盈利中枢持续下移（iFinD实拉）", "传统核心业务2025年收入-5%、2026Q1-3%，主业增长见顶（证券之星2026-09）", "低毛利办公直销集采占比提升，结构性拉低整体毛利率", "九木杂物社等新门店模式盈利仍在探索，投入回报待验证"], "evidence": ["2025年营收250.64亿元、归母净利13.10亿元（2024年13.96亿元，同比下滑）（同花顺财报数据）", "传统核心业务2025年收入88.45亿元(-5%)，2026Q1收入19.9亿元(-3%)（证券之星2026-09-27）", "拟每10股派10元共9.16亿元，分红率约70%（公司2025年度利润分配预案2026-04）", "2026年5月董事长提议回购公司股份（晨光文具公告2026-05-22/06-02）"], "tier": "观察", "tier_reason": "品牌渠道与现金流良好、分红回购加码，但ROE与毛利率持续下行、主业增长见顶，盈利中枢下移趋势尚未扭转，归入观察并跟踪核心品类与新业务盈利修复。", "missing_fields": []}, {"code": "603605.SH", "name": "珀莱雅", "industry": "化妆品/国货品牌", "cluster": "家电/消费品牌", "data_date": "2026-10-23", "price": 56.99, "market_cap_yi": 225.7, "pe_ttm": 12.09, "pb": 3.39, "dividend_yield_ttm": 4.18, "pe_pct_10y": 1.31, "pb_pct_10y": 0.99, "roe_5y": {"2021": 22.25, "2022": 25.95, "2023": 29.94, "2024": 32.53, "2025": 25.8}, "gross_margin_latest": 73.26, "gross_margin_trend": "持续提升（2021年66.46%升至2025年73.26%）", "ocf_to_income": 1.24, "debt_ratio": 26.17, "bank_special": null, "dividend_buyback": "2025年度拟每10股派12元（年度派息率约31%-52%口径，iFinD）；实行一年多次分红：2024年度每股派1.19元共约4.69亿元、2025年中期已派现、2026年中期拟每10股派11.8元；公司设回购专户（来源：公司2025年报2026-04-20；上证报2026-08-25）。", "understand": "主营护肤彩妆，以'珀莱雅'主品牌红宝石/双抗/源力等大单品打市场，并拓展彩棠、OR等子品牌。生意可懂，但化妆品品牌依赖持续营销投入与单品迭代，'买下整家公司10年不上市'的确定性弱于必选消费——品牌热度与产品生命周期是关键变量。", "good": "国货护肤头部，毛利率高达73.3%且逐年提升，近5年加权ROE22.3%-32.5%（2025年25.8%自高位回落），资产负债率仅26.2%、2025年经营现金流/经营净收益=1.24，财务很干净。但成长驱动偏营销与大单品运营（代言人、话题投放密集），2025年营收105.97亿元(-1.7%)、归母净利14.98亿元(-3.5%)出现增长见顶迹象，品牌护城河能否脱离高营销投放自我延续，需持续证伪。", "cheap": "PE(TTM)12.1倍、PB3.39倍，PE近10年分位仅1.3%、PB分位1.0%，估值已从成长股高位大幅回落；TTM股息率约4.2%。毛估估当前价格已较充分反映增长放缓；便宜程度取决于大单品矩阵能否在2026-2027年重新接棒增长，而非营销费用堆出来的短期脉冲（仅为估值位置描述，非买卖建议）。", "moat": ["国货护肤品牌", "大单品矩阵运营", "高毛利+轻资产"], "risks": ["增长偏营销驱动：红宝石系列依赖代言（宋佳）、运动大使（王欣瑜）与话题投放，品牌热度可持续性存疑（公司2025年报摘要2026-04-22）", "2025年营收(-1.7%)、归母净利(-3.5%)自上市高增长后首次回落，增长见顶迹象需跟踪", "化妆品赛道竞争激烈、新品失败率高，大单品生命周期有限，营销费用率波动直接影响利润", "派息率相对其高ROE仍偏低，股东回报力度弱于板块白电龙头"], "evidence": ["2025年营收105.97亿元、归母净利14.98亿元，较2024年(营收107.78亿、净利15.52亿)双双小幅回落（同花顺财报数据）", "红宝石系列签宋佳为全球代言人、王欣瑜为活力大使，线上话题曝光2000万+（公司2025年报摘要2026-04-22）", "实行一年多次分红，2025年度每10股派12元、2026中期拟每10股派11.8元（上证报2026-08-25）", "毛利率由2021年66.46%升至2025年73.26%，资产负债率仅26.17%（iFinD财务指标）"], "tier": "观察", "tier_reason": "高毛利、高ROE、轻资产且估值已大幅回落，但成长偏营销驱动、2025年首次出现营收净利双降，品牌护城河的自我延续性待证伪，按框架'靠营销驱动而非产品'作降级处理，归入观察。", "missing_fields": []}, {"code": "600900.SH", "name": "长江电力", "industry": "水力发电", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 29.45, "market_cap_yi": 7205.9, "pe_ttm": 19.9, "pb": 3.34, "dividend_yield_ttm": 3.4, "pe_pct_10y": 63.33, "pb_pct_10y": 90.63, "roe_5y": {"2021": 14.92, "2022": 11.73, "2023": 13.52, "2024": 15.71, "2025": 15.9}, "gross_margin_latest": 61.67, "gross_margin_trend": "稳定", "ocf_to_income": 1.68, "debt_ratio": 58.27, "bank_special": null, "dividend_buyback": "2023-2025累计现金分红632.30亿元(iFinD)；2025全年累计派现244.68亿元创新高(同花顺2026-09-01)；《2026-2030年分红回报规划》承诺每年现金分红不低于当年归母净利润70%(公司官网)；无回购注销记录。", "understand": "业务极简单：运营三峡、葛洲坝、溪洛渡、向家坝、乌东德、白鹤滩六座梯级水电站，2025年总装机7179.5万千瓦、发电量3071.94亿千瓦时(+3.82%)，电价和上网路径长期锁定，未来10年现金流可预测性在A股属最高一档，符合“买下公司10年不上市也能睡好觉”的标准。", "good": "护城河为流域梯级调度的特许经营+资源垄断：长江干流优质坝址不可复制，毛利率长期60%左右(2021-2025:62.06/57.29/57.83/59.13/61.67)。折旧巨大导致经营现金流/经营活动净收益达1.68、负债率58.27%以长期有息负债为主，均属重资产水电行业特性而非经营风险。公司承诺2026-2030分红率不低于70%，叠加抽水蓄能7个在建项目(合计900万千瓦)提供增量，股东回报文化清晰。", "cheap": "PE(TTM)19.90倍处近10年63%分位、PB3.34倍处90.6%分位，估值已不便宜，市场给了“类债券”确定性溢价；股息率TTM 3.40%相对长期国债收益率有一定利差但不厚。以70%分红率和年净利约345亿元毛估，当前市值已较充分反映其稳定现金流，安全边际主要来自对公司的理解而非价格折扣。", "moat": ["特许经营", "流域资源垄断", "梯级调度协同"], "risks": ["来水波动：枯水年发电量直接下滑(2022年ROE曾降至11.73%)", "PB分位90.6%处近10年高位，利率上行时高股息资产估值承压", "抽蓄及新能源资本开支若回报率偏低会摊薄ROE"], "evidence": ["公司2025年报：六座梯级电站发电量3071.94亿千瓦时、+3.82%(上交所2026-04-30)", "公司官网：2026-2030年每年现金分红不低于归母净利润70%", "同花顺2026-09-01：2025全年派现244.68亿创新高，2026H1净利+13.02%", "2026跟踪评级报告：7个在建抽蓄项目合计900万千瓦(上交所2026-06-25)"], "tier": "核心", "tier_reason": "商业模式最简单可懂、资源垄断型护城河长期坚固、近5年ROE中枢约14%达标、现金流与分红承诺明确，仅估值分位偏高需在cheap段如实提示。", "missing_fields": ["回购注销明细未取到"]}, {"code": "600025.SH", "name": "华能水电", "industry": "水力发电", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 10.15, "market_cap_yi": 1891.1, "pe_ttm": 22.86, "pb": 2.71, "dividend_yield_ttm": 2.02, "pe_pct_10y": 83.81, "pb_pct_10y": 73.27, "roe_5y": {"2021": 9.29, "2022": 10.59, "2023": 10.5, "2024": 11.85, "2025": 12.93}, "gross_margin_latest": 56.98, "gross_margin_trend": "稳定", "ocf_to_income": 1.82, "debt_ratio": 61.13, "bank_special": null, "dividend_buyback": "2023-2025累计现金分红99.90亿元(iFinD)；2025年度现金分红比例44.91%(iFinD)；无回购注销记录。", "understand": "运营澜沧江流域梯级电站，2025年发电量1269.32亿千瓦时(+13.32%)、营收265.95亿元(+6.89%)，业务简单清晰；但ROE(9.29%-12.93%)长期贴着10%门槛，盈利体量和稳定性弱于长江电力。", "good": "护城河为澜沧江流域水电梯级开发特许经营权，毛利率56.98%且五年稳定(54.63/56.43/56.36/56.13/56.98)。负债率61.13%偏高系大型水电有息负债，经营现金流/经营净收益1.82反映折旧大、现金创造强于账面利润，属行业特性。TB电站等新能源装机投产驱动电量增长，分红比例约45%。", "cheap": "PE(TTM)22.86倍处近10年83.8%分位、PB2.71倍处73.3%分位，股息率TTM仅2.02%，估值偏贵。当前价格已较充分计入装机成长预期，毛估估安全边际不足，需等待估值回落或来水超预期。", "moat": ["特许经营", "流域水电资源"], "risks": ["PE分位83.8%、PB分位73.3%均处近10年偏高区间", "来水波动直接影响发电量和利润", "负债率61.13%偏高，利率与电价改革敏感"], "evidence": ["公司2025年报：发电量1269.32亿千瓦时、+13.32%，营收265.95亿、+6.89%(上交所2026-04-29)", "2025H1发电量527.52亿千瓦时、+12.97%，TB电站全容量投产(广东水科学会2025-07-10)"], "tier": "观察", "tier_reason": "商业模式可懂、毛利率稳定，但ROE仅约10%-13%刚过放宽门槛，且PE/PB历史分位均偏高、股息率偏低，估值待消化。", "missing_fields": ["回购注销明细未取到"]}, {"code": "600674.SH", "name": "川投能源", "industry": "水电参股投资", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 17.22, "market_cap_yi": 839.4, "pe_ttm": 17.0, "pb": 1.8, "dividend_yield_ttm": 2.9, "pe_pct_10y": 82.1, "pb_pct_10y": 55.25, "roe_5y": {"2021": 10.33, "2022": 10.8, "2023": 12.63, "2024": 11.1, "2025": 10.97}, "gross_margin_latest": 50.7, "gross_margin_trend": "提升", "ocf_to_income": 20.69, "debt_ratio": 33.51, "bank_special": null, "dividend_buyback": "2023-2025累计现金分红56.84亿元(iFinD)；2025年度每10股派5元、合计24.37亿元，占归母净利润51.27%(公司2025年报/新浪财经2026-04-20)；自1993年上市累计分红超190亿元；无回购注销记录。", "understand": "本质是雅砻江水电(持股48%)的参股平台，2025年确认投资收益44.25亿元，自身营收仅16.68亿元、归母净利47.54亿元绝大部分来自权益法核算。业务可懂但需穿透理解雅砻江流域来水与分红政策。", "good": "护城河=持有雅砻江水电48%股权这一稀缺水电资产，毛利率50.70%且五年提升(41.91/38.51/46.37/51.18/50.70)。注意：经营现金流/经营活动净收益高达20.69系口径失真——雅砻江投资收益不计入经营活动净收益分母，真实现金来源是雅砻江宣告的现金股利(2025年32.16亿元)。分红比例约51%，2026年雅砻江分红35.52亿元(+10.4%)。", "cheap": "PE(TTM)17.00倍处近10年82.1%分位、PB1.80倍处55.3%分位，股息率TTM 2.90%。估值处偏高区间，2025年雅砻江来水仅多年均值80%属低基数，未来盈利弹性依赖来水修复，当前价格安全边际一般。", "moat": ["参股稀缺水电资产", "特许经营(雅砻江)"], "risks": ["利润高度依赖雅砻江48%权益，自身无控制权，分红政策受股东协调影响", "PE分位82.1%偏高", "2025年雅砻江来水仅多年均值80%，水文波动直接传导"], "evidence": ["2026跟踪评级报告：持雅砻江水电48%、2025确认投资收益44.25亿、宣告现金股利32.16亿(中国金融信息网2026-07-09)", "公司2025年报：每10股派5元、合计24.37亿、占归母51.27%(上交所2026-04-18)", "证券之星2026-10-14：2025雅砻江来水多年均值80%，2026雅砻江宣告分红35.52亿、+10.4%"], "tier": "观察", "tier_reason": "持有稀缺雅砻江水电资产、分红比例51%尚可，但ROE约11%刚过放宽门槛、利润受参股方来水与分红政策约束，且PE分位82%偏高。", "missing_fields": ["回购注销明细未取到"]}, {"code": "600377.SH", "name": "宁沪高速", "industry": "高速公路", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 13.29, "market_cap_yi": 669.5, "pe_ttm": 14.33, "pb": 1.61, "dividend_yield_ttm": 5.57, "pe_pct_10y": 73.39, "pb_pct_10y": 33.39, "roe_5y": {"2021": 14.37, "2022": 11.23, "2023": 13.39, "2024": 13.63, "2025": 11.48}, "gross_margin_latest": 30.07, "gross_margin_trend": "下滑", "ocf_to_income": 1.39, "debt_ratio": 42.96, "bank_special": null, "dividend_buyback": "2023-2025累计现金分红71.54亿元(iFinD)；2025年度每股派0.49元(上交所2026-03-30)；2026中期每股派0.25元(2026-08-28)；2025年度分红比例53.73%(iFinD)；无回购注销记录。", "understand": "核心资产是沪宁高速这一长三角最繁忙通道，2025H1沪宁高速客车流量99326辆/日(+1.39%)，业务即收过路费，简单可懂；但2025年营收202.89亿、归母净利45.94亿较2024年49.47亿下滑，且利润含江苏银行分红等投资收益扰动。", "good": "护城河为长三角干线的特许经营权，车流量长期稳定。但毛利率五年下滑(36.33/33.30/36.94/26.28/30.07)，2024年低点后2025年回升；负债率42.96%、经营现金流/经营净收益1.39属重资产特许经营常态。分红比例约54%，2026年起中期也分红，股东回报稳定。", "cheap": "PE(TTM)14.33倍处近10年73.4%分位，但PB1.61倍处33.4%分位、股息率TTM 5.57%为组合内最高。以高股息角度毛估有配置价值，但ROE已从14%降至11.48%、车流量增长平缓，估值下行空间有限而上行弹性不足。", "moat": ["特许经营", "干线路网稀缺性"], "risks": ["ROE五年下滑(14.37%→11.48%)，毛利率2024年一度降至26.28%", "收费公路有特许经营期限，到期后续期政策不确定", "利润受江苏银行等参股投资收益周期扰动"], "evidence": ["公司2025年报：营收202.89亿、归母净利45.94亿，每股派0.49元(上交所2026-03-30)", "2025H1沪宁高速客车流量99326辆/日、+1.39%(上交所2025-08-28)", "2026中期每股派0.25元(上海证券报2026-08-28)"], "tier": "观察", "tier_reason": "高股息(5.57%)+干线特许经营基本符合框架，但ROE与毛利率近年下滑、成长性缺失，估值处历史中等偏上。", "missing_fields": ["回购注销明细未取到"]}, {"code": "600941.SH", "name": "中国移动", "industry": "通信运营", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 99.14, "market_cap_yi": 21509.3, "pe_ttm": 16.81, "pb": 1.54, "dividend_yield_ttm": 4.75, "pe_pct_10y": 81.87, "pb_pct_10y": 41.81, "roe_5y": {"2021": 10.11, "2022": 10.08, "2023": 10.23, "2024": 10.36, "2025": 9.94}, "gross_margin_latest": 28.87, "gross_margin_trend": "稳定", "ocf_to_income": 1.55, "debt_ratio": 33.22, "bank_special": null, "dividend_buyback": "2023-2025累计现金分红2911.46亿元(iFinD)；2025全年股息每股5.27港元(+3.5%)，全年派息率75%，公司明示2026年派息率稳中有升(新华网/公司公告2026-03-26)；无回购注销记录。", "understand": "业务简单：移动+宽带+算力三大块，2025年营运收入10501.87亿、归母净利1370.95亿，用户规模和基站网络决定其收费能力，未来现金流可预测性较强；但ROE约10%属重资产运营商常态，成长性来自算力(2025算力服务收入898亿、+11.1%)而非传统通信。", "good": "护城河为牌照+网络效应+庞大用户基础，毛利率28.87%五年极稳(28.81/27.78/28.23/29.02/28.87)。经营现金流/经营净收益1.55、负债率33.22%，现金创造能力强。公司承诺75%派息率且逐年提升，股东回报文化在央企中最明确之一；智算规模92.5EFLOPS提供第二曲线。", "cheap": "PE(TTM)16.81倍处近10年81.9%分位(2022年回A后估值修复较充分)、PB1.54倍处41.8%分位，股息率TTM 4.75%。以75%派息率和年净利约1371亿毛估，类债券属性清晰，但PE分位偏高意味着价格已不便宜，安全边际一般。", "moat": ["牌照壁垒", "网络效应", "用户规模"], "risks": ["PE分位81.9%处近10年偏高", "资本开支持续高位(2025年1569.51亿元)压制自由现金流", "传统通信ARPU增长见顶，算力业务竞争加剧"], "evidence": ["公司2025年报：营运收入10501.87亿、归母净利1370.95亿(年报/同花顺)", "新华网2026-03-26：2025全年股息5.27港元、派息率75%、2026派息率稳中有升", "公司2025业绩：算力服务收入898亿、+11.1%，智算增速279%，智算规模92.5EFLOPS(2026-03-26)"], "tier": "核心", "tier_reason": "网络效应+牌照护城河长期坚固、现金流强、75%派息率承诺明确，ROE约10%符合重资产运营商放宽门槛；仅PE分位偏高需在估值段提示。", "missing_fields": ["回购注销明细未取到"]}, {"code": "600036.SH", "name": "招商银行", "industry": "股份制银行", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 41.77, "market_cap_yi": 10534.3, "pe_ttm": 6.94, "pb": 0.92, "dividend_yield_ttm": 2.4, "pe_pct_10y": 31.51, "pb_pct_10y": 15.77, "roe_5y": {"2021": 16.96, "2022": 17.06, "2023": 16.22, "2024": 14.49, "2025": 13.44}, "gross_margin_latest": null, "gross_margin_trend": "不适用", "ocf_to_income": null, "debt_ratio": null, "bank_special": {"npl": 0.94, "coverage": 391.79, "nim": 1.87, "car": 18.24, "asof": "FY2025；2026H1：NPL0.94/拨备385.10/NIM1.83/CAR18.33"}, "dividend_buyback": "2023-2025累计现金分红1440.05亿元(iFinD)；2025全年每股分红2.016元、分红比例35.34%(招行2025年报/东方财富)；无回购注销记录。", "understand": "银行业务本质是经营风险和资金错配，招行以零售金融见长(零售AUM18.44万亿)，2025年营收3375.32亿(+0.01%)、归母净利1501.81亿(+1.21%)。银行不在段永平能力圈舒适区，但招行零售模式相对透明可跟踪。", "good": "护城河为零售客户基础+财富管理品牌，非息净收入占比37%为行业最高之一，净息差2026H1为1.83%(-5BP降幅收窄)。资产质量扎实：FY2025不良率0.94%(-0.01pct)、拨备覆盖率391.79%、资本充足率18.24%。但ROE从17.06%(2022)降至13.44%(2025)，下行趋势需正视；分红比例提升至35.34%。", "cheap": "PE(TTM)6.94倍处近10年31.5%分位、PB0.92倍处15.8%分位(破净)，股息率TTM 2.40%。以破净估值和年净利1500亿毛估，市场已计入息差下行和ROE回落预期，估值在组合内偏低；但银行盈利受宏观地产与利率周期制约，毛估估只能定性判断。", "moat": ["零售客户基础", "财富管理品牌", "牌照"], "risks": ["ROE五年持续下行(17.06%→13.44%)", "净息差1.83%仍处历史低位，资产端定价压力未消", "房地产与零售贷款资产质量周期性暴露"], "evidence": ["招行2025年报：营收3375.32亿、归母净利1501.81亿、加权ROE13.44%、每股派2.016元、分红率35.34%(2026-03-27)", "招行2026中报：营收1781.81亿(+4.83%)、归母净利764.45亿(+2.02%)、净息差1.83%(-5BP)、零售AUM18.44万亿(2026-08-29)", "招行2025业绩摘要：不良率0.94%、不良生成率1.03%(2026-04-08)"], "tier": "核心", "tier_reason": "零售护城河与资产质量在股份行中最优、PB破净处历史低分位、分红比例提升，ROE下行已在估值中反映，属框架内高置信度银行标的。", "missing_fields": ["毛利率(银行不适用)", "资产负债率(银行不适用)", "回购注销明细未取到"]}, {"code": "002142.SZ", "name": "宁波银行", "industry": "城商行", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 33.64, "market_cap_yi": 2221.4, "pe_ttm": 7.14, "pb": 0.92, "dividend_yield_ttm": 3.86, "pe_pct_10y": 30.1, "pb_pct_10y": 23.93, "roe_5y": {"2021": 16.63, "2022": 15.56, "2023": 15.08, "2024": 13.59, "2025": 13.11}, "gross_margin_latest": null, "gross_margin_trend": "不适用", "ocf_to_income": null, "debt_ratio": null, "bank_special": {"npl": 0.76, "coverage": 373.16, "nim": 1.74, "car": 14.3, "asof": "FY2025；2026H1：NPL0.76/拨备373.35/NIM1.70/CAR14.64"}, "dividend_buyback": "2023-2025累计现金分红151.88亿元(iFinD)；2025年度分红比例约20.26%(iFinD)；2026中期每10股派4元(上海证券报2026-08-19)；无回购注销记录。", "understand": "长三角城商行，2025年营收719.69亿(+8.01%)、归母净利293.33亿(+8.13%)，2026H1营收414.50亿(+11.54%)、归母净利165.62亿(+12.12%)，成长性在上市银行中领先；但银行商业模式仍复杂，且ROE从16.63%降至13.11%。", "good": "护城河为长三角区域客户+中小微业务定价能力，资产质量最优之一：FY2025不良率0.76%、拨备覆盖率373.16%、资本充足率14.30%；手续费净收入2025年+30.72%显示轻资本转型。但净息差2026H1为1.70%(-6BP)持续收窄，ROE五年从16.63%降至13.11%。", "cheap": "PE(TTM)7.14倍处近10年30.1%分位、PB0.92倍处23.9%分位，股息率TTM 3.86%。估值不贵，但相对招行其分红率仅约20%，股东回报强度弱于成长性叙事；毛估估合理偏低，需跟踪息差与ROE能否企稳。", "moat": ["区域客户基础", "牌照", "中小微定价能力"], "risks": ["ROE五年下行(16.63%→13.11%)", "净息差1.70%持续收窄(-6BP)", "高成长依赖长三角景气，区域集中风险"], "evidence": ["宁波银行2025业绩快报：营收719.68亿(+8.01%)、归母净利293.33亿(+8.13%)、不良率0.76%(2026-01-20)", "宁波银行2026中报：营收414.50亿(+11.54%)、归母净利165.62亿(+12.12%)、净息差1.70%(-6BP)、中期每10股派4元(2026-08-19/20)", "2025手续费净收入60.85亿、+30.72%(上海证券报2026-04-24)"], "tier": "观察", "tier_reason": "成长性与资产质量优秀、估值低分位，但ROE与净息差持续下行、分红率偏低，需跟踪息差企稳信号后再判断是否升级。", "missing_fields": ["毛利率(银行不适用)", "资产负债率(银行不适用)", "回购注销明细未取到"]}, {"code": "601318.SH", "name": "中国平安", "industry": "保险综合金融", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 51.76, "market_cap_yi": 9372.5, "pe_ttm": 5.88, "pb": 0.91, "dividend_yield_ttm": 5.27, "pe_pct_10y": 0.9, "pb_pct_10y": 12.07, "roe_5y": {"2021": 13.0, "2022": 10.1, "2023": 9.7, "2024": 13.8, "2025": 14.0}, "gross_margin_latest": null, "gross_margin_trend": "不适用", "ocf_to_income": null, "debt_ratio": null, "bank_special": {"npl": null, "coverage": null, "nim": null, "car": null, "asof": "保险不适用；FY2025：内含价值1.5043万亿、寿险NBV368.97亿(+29.3%)、产险综合成本率96.8%"}, "dividend_buyback": "2023-2025累计现金分红1345.40亿元(iFinD)；2025全年现金分红总额488.91亿元、末期每股1.75元，连续14年上涨(公司2025业绩公告2026-03-26)；2026H1分红同比+3.2%(公司2026中报)；无回购注销记录。", "understand": "保险商业模式复杂：寿险利差/死费差、产险承保+投资、综合金融交叉销售，现金流难以像水电那样直观预测；2025年归母营运利润+10.3%、NBV 368.97亿(+29.3%)，但ROE波动大(2022-2023年曾跌破10%)，超出普通投资者能力圈舒适区。", "good": "护城河为综合金融牌照+全国代理人/银保渠道+品牌，寿险改革见效：2025年NBV margin提升至28.5%(+5.8pct)、分红险占新业务超90%；产险综合成本率96.8%(2026Q1进一步至95.8%)。地产投资余额2052.54亿、占总投资资产3.1%且以物权为主，风险已大幅出清。连续14年分红增长。", "cheap": "PE(TTM)5.88倍处近10年0.9%分位(极低)、PB0.91倍处12.1%分位，股息率TTM 5.27%。从估值角度看市场极悲观，毛估估具备修复空间；但保险盈利对投资端和假设敏感，低PE/低PB既可能是机会也可能反映其盈利质量难测，需持续跟踪。", "moat": ["综合金融牌照", "渠道网络", "品牌"], "risks": ["保险盈利受投资端利率下行与权益市场波动影响大，可预测性弱", "不动产投资余额2052.54亿仍需跟踪", "ROE曾连续两年低于10%(2022-2023)，稳定性待验证"], "evidence": ["公司2025业绩：归母营运利润+10.3%、NBV368.97亿(+29.3%)、全年分红488.91亿连续14年上涨(2026-03-26)", "公司2026中报：归母营运利润+8.3%、归母净利+36.1%、NBV+11.2%、分红+3.2%(2026-08-21)", "东方财富：截至2026H1不动产投资余额2052.54亿、占总投资资产3.1%", "2026Q1产险综合成本率95.8%、同比优化0.8pct(公司2026一季报)"], "tier": "观察", "tier_reason": "估值处近10年极低分位、寿险改革见效、分红连续14年增长，但保险业务复杂、ROE波动大、投资端不确定性高，需更多季度验证。", "missing_fields": ["毛利率(保险不适用)", "资产负债率(保险不适用)", "回购注销明细未取到"]}, {"code": "601088.SH", "name": "中国神华", "industry": "煤炭/煤电一体化", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 50.2, "market_cap_yi": 10888.1, "pe_ttm": 19.99, "pb": 2.45, "dividend_yield_ttm": 4.0, "pe_pct_10y": 97.62, "pb_pct_10y": 98.64, "roe_5y": {"2021": 13.64, "2022": 18.07, "2023": 14.88, "2024": 14.04, "2025": 12.76}, "gross_margin_latest": 35.08, "gross_margin_trend": "周期波动", "ocf_to_income": 1.06, "debt_ratio": 23.31, "bank_special": null, "dividend_buyback": "2023-2025累计现金分红1599.42亿元(iFinD)；2025年度全年派现占归母净利润79.1%(末期每股1.03元、223.40亿，公司2026-03-31)；2025-2027股东回报规划承诺现金分红不低于归母净利65%(业绩说明会2026-03)；2026中期每股派0.98元、212.56亿(2026-08)；无回购注销记录。", "understand": "煤电路港航化一体化龙头，业务可懂：挖煤、运煤、发电、煤化工。但煤炭是强周期行业，2025年营收2949.16亿(较2024年3397.88亿下滑)、归母净利542.18亿(较595.44亿下滑)，利润中枢随煤价回落，10年现金流取决于煤价周期判断。", "good": "护城河=一体化低成本运营+长协锁定：长协煤占比超80%，2026H1秦皇岛5500大卡长协均价约686-697元/吨，煤价下行周期盈利底线被长协机制守住，上行弹性则弱于纯现货煤企。毛利率35.08%五年周期波动(33.04/39.03/35.90/34.04/35.08)、负债率仅23.31%、经营现金流/经营净收益1.06。分红率约79%为组合最高之一。", "cheap": "PE(TTM)19.99倍处近10年97.6%分位、PB2.45倍处98.6%分位，估值处近10年极贵位置(盈利回落导致PE被动抬升)。以年净利542亿且随煤价中枢下行、市值1.09万亿毛估，当前价格并不便宜；高分红(4.0%股息率)依赖煤价不进一步大跌，周期位置判断难度高。", "moat": ["一体化成本优势", "长协合同", "资源禀赋"], "risks": ["PE/PB分位97%+处近10年最贵区间", "煤价中枢下行：2025营收-13%、归母净利-9%", "能源转型长期压制煤炭需求预期，高分红可持续性依赖煤价"], "evidence": ["公司2025年报：营收2949.16亿、归母净利542.18亿(同比下滑)(同花顺/年报)", "公司2026中期业绩公告：长协执行价697元/吨、2026中期每股派0.98元(2026-08-28)", "新浪财经2026-07-24：长协占比超80%、2026H1长协均价686元/吨(+1%)、上半年净利最高增21%", "公司2026-03-31：2025全年派现占归母79.1%；2025-2027规划分红率不低于65%"], "tier": "观察", "tier_reason": "一体化+长协平滑盈利、高分红(79%)特征明确，但PE/PB近10年分位97%+极贵、煤价周期下行，毛估估安全边际不足。", "missing_fields": ["回购注销明细未取到"]}, {"code": "600938.SH", "name": "中国海油", "industry": "海上油气勘探开发", "cluster": "公用事业/金融/能源/通信", "data_date": "2026-10-23", "price": 33.72, "market_cap_yi": 16027.1, "pe_ttm": 11.58, "pb": 1.87, "dividend_yield_ttm": 3.83, "pe_pct_10y": 86.77, "pb_pct_10y": 72.8, "roe_5y": {"2021": 15.36, "2022": 26.0, "2023": 19.55, "2024": 19.36, "2025": 15.64}, "gross_margin_latest": 51.47, "gross_margin_trend": "稳定", "ocf_to_income": 1.24, "debt_ratio": 26.71, "bank_special": null, "dividend_buyback": "2023-2025累计现金分红1790.51亿元(iFinD)；2025全年股息每股1.28港元(公司2025业绩2026-03-26)；2026中期每股0.94港元(2026中期业绩)；无回购注销记录。", "understand": "海上油气勘探开发龙头，业务可懂：找油、采油、卖油。2025年净产量777百万桶油当量创历史新高、归母净利1221亿元；但油价是核心变量，2025年实现油价66.47美元/桶(同比-13.4%)，利润随油价周期波动，10年现金流取决于对长期油价中枢的判断。", "good": "护城河=中国海域专营权+低成本：2026H1桶油主要成本29.7美元，毛利率51.47%五年高位稳定(50.60/53.05/49.88/53.63/51.47)，负债率仅26.71%、经营现金流/经营净收益1.24。产量成长路径清晰：五年66个新发现、净产量CAGR约8%，圭亚那Stabroek区块25%权益、Yellowtail投产，2026年产量目标780-800百万桶油当量。", "cheap": "PE(TTM)11.58倍处近10年86.8%分位、PB1.87倍处72.8%分位，股息率TTM 3.83%。相对油价66美元的盈利水平，估值已反映产量成长预期；油价若中枢继续下移，高分红(2025年每股1.28港元)可持续性存疑，毛估估中性偏贵。", "moat": ["海域专营权", "低成本", "储量增长"], "risks": ["强周期：实现油价66.47美元(-13.4%)，ROE从26%(2022)降至15.64%(2025)", "PE分位86.8%处近10年偏高", "资本开支1120-1220亿/年高投入，地缘与油价双重敏感"], "evidence": ["公司2025年报：净产量777百万桶油当量创新高、归母净利1221亿、实现油价66.47美元(-13.4%)(2026-03-26)", "公司2026中期业绩：桶油成本29.7美元、产量398.7百万桶(+3.7%)、中期股息0.94港元(2026-08-27)", "公司指引：2026产量目标780-800百万桶油当量、资本开支1120-1220亿(2026-03-26)", "圭亚那Stabroek区块25%权益、Yellowtail投产(公司官网)"], "tier": "观察", "tier_reason": "低成本+海域专营权+产量成长符合框架，但油价周期决定盈利，PE/PB历史分位偏高，高分红可持续性依赖油价中枢。", "missing_fields": ["回购注销明细未取到"]}, {"code": "600660.SH", "name": "福耀玻璃", "industry": "汽车玻璃", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 52.66, "market_cap_yi": 1374.3, "pe_ttm": 16.65, "pb": 3.67, "dividend_yield_ttm": 4.18, "pe_pct_10y": 18.67, "pb_pct_10y": 53.57, "roe_5y": {"2021": 12.96, "2022": 17.65, "2023": 18.97, "2024": 22.72, "2025": 25.56}, "gross_margin_latest": 37.27, "gross_margin_trend": "稳定提升（高附加值天幕/智能玻璃占比提高）", "ocf_to_income": 1.11, "debt_ratio": 46.4, "bank_special": null, "dividend_buyback": "2025年报营收457.87亿(+16.65%)、归母净利93.12亿(+24.20%)双创历史新高；2026年中期每股派现1.00元、合计26.10亿，占上半年归母净利65.73%（上证报2026-08-19）。", "understand": "业务很简单：为全球整车厂配套汽车玻璃，按订单生产、随车企产量小幅波动，10年现金流可大致预测。它不是需要猜技术路线的公司，而是把单一产品做到全球最有效率。", "good": "护城河是全球规模+成本+技术叠加：全球汽车玻璃份额约34%-35%、国内约68%，美国俄亥俄工厂本地生产规避关税且2026H1净利4.67亿已接近2025全年。近5年ROE从12.96%逐年升至25.56%，毛利率37%稳定，经营现金流/经营净收益1.11匹配，股东回报慷慨（2026中期分红率66%）。曹德旺长期产品导向、二代曹晖平稳接班。", "cheap": "PE(TTM)16.65倍、近10年PE分位仅18.7%，PB分位53.6%居中。对照一家ROE约25%、利润仍在创新高的全球成本技术龙头，估值处于历史偏低区间；PB分位不算极低主要因近年利润与净资产同步增厚。毛估估价格不昂贵。", "moat": ["全球规模成本", "技术/客户认证转换成本", "本地产能规避贸易壁垒"], "risks": ["2026H1归母净利39.70亿同比-17.37%，主因汇兑损失8.03亿（上年同期为收益6.02亿），非经营恶化但显示汇率波动对利润扰动大", "美国加征关税/贸易政策反复，曹德旺公开称'大不了关掉美国工厂'，海外政策不确定性仍在", "整车销量周期性波动、纯碱/天然气等能源价格影响成本"], "evidence": ["第一财经2026-03-17：2025营收457.87亿、净利93.12亿双创新高，二代接棒首份年报", "上证报2026-08-19：2026中期分红26.1亿、支付率65.73%，汇兑损失8.03亿拖累利润", "新浪/华尔街见闻2026-04：全球份额约34%，曹德旺谈美国关税'不做赔本买卖'", "证券之星2026-08-19：美国子公司2026H1收入39.75亿、净利4.67亿"], "tier": "核心", "tier_reason": "业务简单可懂、全球成本+技术+客户认证护城河长期坚固、近5年ROE持续抬升至25.56%、现金流与高分红匹配、治理无硬伤，是本分片高置信度标的。", "missing_fields": []}, {"code": "600436.SH", "name": "片仔癀", "industry": "中药/肝病用药", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 123.15, "market_cap_yi": 743.0, "pe_ttm": 41.06, "pb": 5.08, "dividend_yield_ttm": 2.14, "pe_pct_10y": 5.13, "pb_pct_10y": 3.03, "roe_5y": {"2021": 27.68, "2022": 23.5, "2023": 22.64, "2024": 21.36, "2025": 14.84}, "gross_margin_latest": 36.43, "gross_margin_trend": "下滑（2024年42.74%降至2025年36.43%，高价原料库存拖累）", "ocf_to_income": 0.04, "debt_ratio": 14.08, "bank_special": null, "dividend_buyback": "2025年度拟10派15.70元(含税)，对应现价股息率约1.3%（全年TTM约2.14%）；资产负债率仅14%、账上无有息压力（公司2025年报/上证报2026-04-30）。", "understand": "大单品片仔癀（锭剂）配方国家保密、原料天然麝香+牛黄稀缺，提价权长期存在，业务简单。但收入高度依赖单一肝病用药大单品，第二曲线（安宫牛黄丸）尚未跑通，未来现金流受渠道库存周期与原料价格影响较大。", "good": "护城河是国家保密配方+稀缺原料牌照+品牌，理论上长期定价权强。但2025年明显走弱：营收90.01亿(-16.56%)、归母净利21.59亿(-27.49%)、扣非-34.25%；毛利率从42.74%降至36.43%；经营现金流净额骤降至0.77亿（2024年为13.14亿），主因存货从49.67亿增至66.79亿（高价牛黄/麝香囤货）。ROE从21%-27%区间降至14.84%。", "cheap": "PE(TTM)41倍绝对不便宜，但近10年PE分位仅5.1%、PB分位3.0%——估值已回到上市以来最低区间，反映了市场对业绩下滑的定价。当前价格更多是'高ROE白马均值回归后'的位置，而非便宜；需等待毛利率与现金流修复确认。", "moat": ["国家保密配方", "稀缺原料牌照", "品牌定价权"], "risks": ["2025年收到上交所年报信息披露监管问询函并于2026-08-01回复，涉及业绩下滑等，治理层面需跟踪", "经营现金流/经营净收益仅0.04，存货66.79亿占用巨额资金，若原料价格下跌存在减值风险", "大单品依赖：心脑血管用药（安宫牛黄丸）2025收入-59.42%至1.15亿、毛利率降至7.95%，第二曲线失败", "肝病用药销量+26%但收入-20%，隐含渠道去库存/出厂均价下行"], "evidence": ["中证网2026-04-30：2025营收90.01亿(-16.56%)、归母净利21.59亿(-27.49%)、扣非-34.25%", "上海证券报2026-08-01：公司回复上交所年报问询函，肝病用药收入42.68亿(-20%)、销量+26%", "新浪财经2026-05-09：安宫牛黄丸所在心脑血管板块收入-59.42%、毛利率7.95%", "证券时报2026-06-28/中证报2026-09：天然牛黄从165万/kg回落至约52万/kg，公司获首张阿根廷天然牛黄进口批件(2026-04)，存货2026H1降至59.54亿，毛利率修复中"], "tier": "观察", "tier_reason": "保密配方与稀缺原料护城河仍在、估值已回历史低位、2026年原料成本下行+库存出清利于修复；但2025年利润/现金流明显恶化、收监管问询、第二曲线未兑现，需跟踪毛利率与经营现金流能否回升，暂列观察。", "missing_fields": []}, {"code": "000423.SZ", "name": "东阿阿胶", "industry": "中药/滋补保健品", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 46.96, "market_cap_yi": 300.5, "pe_ttm": 16.74, "pb": 3.08, "dividend_yield_ttm": 5.92, "pe_pct_10y": 12.92, "pb_pct_10y": 46.93, "roe_5y": {"2021": 4.46, "2022": 7.68, "2023": 11.12, "2024": 14.6, "2025": 16.66}, "gross_margin_latest": 73.47, "gross_margin_trend": "高位稳定（约73%，滋补品高毛利）", "ocf_to_income": 1.15, "debt_ratio": 22.55, "bank_special": null, "dividend_buyback": "2025全年分红17.4亿（年末10派14.31合计9.22亿+中期8.17亿），占归母净利约100%；2025年首次推出不超过2亿元回购并按上限完成；上市以来累计分红超110亿（新华网2026-03-25、公司2026-07）。", "understand": "业务简单：以驴皮为原料的阿胶块及滋补系列，品牌30年、提价与渠道管理经历过2019年渠道库存危机后的完整修复周期。需求端受滋补/养生人群与送礼场景影响，增长温和但可预测。", "good": "护城河是阿胶品类的龙头品牌+高毛利（73.47%）。基本面从2019年危机持续修复：ROE从2021年4.46%逐年回升至2025年16.66%，2025营收67亿(+13.17%)、归母净利17.39亿(+11.67%)。账上货币资金+交易性金融资产约91亿、负债率仅22.55%近乎净现金，经营现金流/经营净收益1.15匹配，连续高比例分红并首次回购。", "cheap": "PE(TTM)16.7倍、近10年PE分位12.9%偏低，股息率TTM 5.92%为分片最高。PB分位46.9%居中。对照一家净现金、ROE回升至16.7%、近乎全额分红的品牌消费公司，估值不贵，主要不确定性在长期需求增长而非价格。", "moat": ["品牌品类龙头", "高毛利滋补品", "净现金+高分红"], "risks": ["阿胶/滋补品面临老龄化与年轻消费习惯变化，长期需求增速可能持续放缓", "驴皮原料成本与供应波动；历史上曾因渠道压货导致2018-2019年业绩大幅下滑，渠道库存管理需持续跟踪", "100%分红虽回报股东，但也反映再投资增长机会有限"], "evidence": ["新华网2026-03-25：2025营收67亿、归母净利17.39亿(+11.67%)，全年分红17.4亿全额分红", "公司投关记录2026-03-20：ROE 16.7%提升2.1pct", "证券之星/央广网2026-09：货币资金+交易性金融资产91亿、负债率22.55%、全年分红100%", "公司2026-07：上市以来累计分红超110亿，2025年首次回购≤2亿完成"], "tier": "观察", "tier_reason": "品牌+净现金+ROE回升至16.7%+全额分红，质地持续改善；但近5年ROE前两年仍低、未形成持续≥15%，且长期滋补需求增长存疑，按框架列观察。", "missing_fields": []}, {"code": "000538.SZ", "name": "云南白药", "industry": "中药/日化", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 52.4, "market_cap_yi": 935.0, "pe_ttm": 17.9, "pb": 2.28, "dividend_yield_ttm": 3.02, "pe_pct_10y": 4.63, "pb_pct_10y": 9.75, "roe_5y": {"2021": 7.58, "2022": 7.87, "2023": 10.51, "2024": 11.99, "2025": 13.02}, "gross_margin_latest": 29.51, "gross_margin_trend": "平稳偏低（约29.5%，被低毛利药品流通业务摊薄）", "ocf_to_income": 0.96, "debt_ratio": 26.02, "bank_special": null, "dividend_buyback": "2025年度分红总额拟46.43亿，占当年归母净利比例超90%（上证报2026-04-01）。", "understand": "四大业务（药品、健康品/牙膏日化、中药资源、云南省医药流通），其中牙膏与白药系列是现金牛，药品流通走量不赚钱。业务可理解，但结构偏多元、利润中仍含一块证券/股权投资收益，需拆分看待。", "good": "护城河是伤科品牌+牙膏等消费日化的国民心智。2025营收411.87亿(+2.88%)、归母净利51.53亿(+8.51%)、扣非创历史新高。投资收益约10.4亿、占净利约20%，较2021-2022年炒股巨亏时期已大幅收敛。ROE从7.6%修复至13.02%，经营现金流/经营净收益0.96匹配，支付率超90%体现对股东友好。", "cheap": "PE(TTM)17.9倍、近10年PE分位4.6%、PB分位9.75%，均处历史低位。对照ROE回升至13%、高分红的品牌消费公司，估值便宜；但毛利率仅29.5%且ROE尚未到15%，便宜有其结构性原因（业务杂、含投资收益）。", "moat": ["品牌（伤科止血）", "消费日化（牙膏）心智", "高分红"], "risks": ["利润中仍有约20%来自投资收益，非主业利润的可持续性与波动需跟踪", "业务板块多元，低毛利药品流通摊薄整体毛利率至29.5%", "牙膏/日化面临 competitors 与线上渠道变化，核心现金牛增长放缓"], "evidence": ["新华网2026-04-02/公司年报：2025营收411.87亿(+2.88%)、归母净利51.53亿(+8.51%)、扣非创新高", "上证报2026-04-01：年度分红46.43亿、支付率超90%", "同花顺财报数据：2025投资收益10.43亿（2024年7.77亿）"], "tier": "观察", "tier_reason": "品牌+牙膏现金牛、高分红、ROE修复且估值历史低位；但ROE仅约13%未达15%门槛、利润仍含约两成投资收益、业务偏多元，列观察。", "missing_fields": []}, {"code": "600085.SH", "name": "同仁堂", "industry": "中药", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 24.64, "market_cap_yi": 337.9, "pe_ttm": 34.84, "pb": 2.48, "dividend_yield_ttm": 2.03, "pe_pct_10y": 27.88, "pb_pct_10y": 3.34, "roe_5y": {"2021": 11.99, "2022": 12.71, "2023": 13.42, "2024": 11.49, "2025": 8.86}, "gross_margin_latest": 42.87, "gross_margin_trend": "小幅下滑（2024年43.96%降至2025年42.87%）", "ocf_to_income": 1.41, "debt_ratio": 30.18, "bank_special": null, "dividend_buyback": "2025年度拟10派5元；上市以来累计派现79.47亿、派现募资比882%，分红一贯稳定（新浪财经2026-09）。", "understand": "三百余年老字号，安宫牛黄丸、六味地黄丸等经典名方品牌力极强，业务简单可懂。但上市公司（600085）仅为集团部分资产，且近年受中药材价格与渠道调整影响，盈利波动加大。", "good": "护城河是无可替代的老字号品牌与经典名方。但当前盈利明显走弱：2025营收172.56亿(-7.21%)、归母净利11.89亿(-22.07%)，为近十年最大降幅、2020年以来首次营收负增长；Q4单季扣非近十年首次亏损，主因年底集中计提高价原材。ROE从13%区间降至8.86%，已低于10%。经营现金流/经营净收益1.41尚可。", "cheap": "PE(TTM)34.8倍看似不低，但近10年PB分位仅3.3%——市场已对盈利下滑大幅折价。PE分位27.9%中等。品牌仍珍贵，但当前ROE低于门槛，估值低是盈利下行的结果而非安全边际。", "moat": ["百年老字号品牌", "经典名方", "长期稳定分红记录"], "risks": ["2025年Q4扣非近十年首亏，年底计提高价存货，中药材价格波动直接冲击利润", "2026H1应收账款15.36亿、较年初+53.53%，渠道压货/回款压力上升", "ROE连续走弱至8.86%，低于10%；国企改革与提价落地效果待验证"], "evidence": ["上证报2026-03-31：2025营收172.56亿、归母净利11.89亿、10派5元", "新浪财经2026-08-29：营收-7.21%、归母净利-22.07%创近十年最大降幅，Q4扣非近十年首亏", "新浪财经2026-09-02：累计派现79.47亿，2026H1应收账款15.36亿较年初+53.53%"], "tier": "观察", "tier_reason": "老字号品牌与分红记录仍在、PB已处历史低位；但ROE降至8.86%低于门槛、盈利与应收走弱，属品牌坚挺但当期经济回报偏弱，列观察而非核心。", "missing_fields": []}, {"code": "600309.SH", "name": "万华化学", "industry": "化工/MDI", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 66.9, "market_cap_yi": 2094.3, "pe_ttm": 12.72, "pb": 1.84, "dividend_yield_ttm": 3.08, "pe_pct_10y": 20.03, "pb_pct_10y": 3.1, "roe_5y": {"2021": 42.53, "2022": 22.75, "2023": 20.42, "2024": 14.29, "2025": 12.44}, "gross_margin_latest": 13.61, "gross_margin_trend": "周期下行压缩（2024年16.16%降至2025年13.61%，2026H1回升至17.08%）", "ocf_to_income": 2.28, "debt_ratio": 62.81, "bank_special": null, "dividend_buyback": "2025年度每股派现1.25元合计39.13亿，加当年回购注销合计44.13亿、占归母净利35.23%；2026中期10派8.10合计25.36亿；承诺现金分红不低于可分配利润30%（上证报2026-04-21、公司回报规划）。", "understand": "全球MDI/TDI龙头，MDI产能380万吨/年、TDI 147万吨/年，技术+规模壁垒高。产品是聚氨酯、石化、新材料的基础化工原料，价格随宏观与地产/家电需求周期波动，业务可理解但盈利强周期。", "good": "护城河是MDI第八代技术+全球成本规模（全球极少数掌握MDI全套技术者之一）。2025营收2032亿、归母净利125.27亿（周期底部），毛利率压至13.6%；但聚氨酯系列毛利率逆势+0.73pct至26.88%，体现技术壁垒。2026年随MDI/TDI涨价周期回暖（2026H1归母净利约100.6亿、毛利率回升至17.08%）。经营现金流/经营净收益2.28（重资产折旧大），分红+回购注销持续。", "cheap": "PE(TTM)12.7倍、近10年PE分位20%，PB分位仅3.1%（历史极低）。对照穿越周期中枢ROE约20%+的全球MDI龙头，周期底部估值便宜；但负债率62.8%偏高、资本开支大，属'便宜的周期成长股'，需承受利润波动。", "moat": ["MDI技术专利壁垒", "全球成本规模", "一体化新材料平台"], "risks": ["强周期：MDI价格受地产/家电/冰冷需求与地缘供给扰动，2025年毛利率一度压至13.6%", "资产负债率62.8%偏高、重资产高资本开支（蓬莱POCHP、乙烯二期、福建技改）", "出口受关税与海外装置不可抗力影响；2025H1聚合MDI外销曾因关税下滑"], "evidence": ["上证报2026-04-21：2025每股派1.25元、分红+回购注销44.13亿占净利35.23%", "证券时报2026-04-21：MDI产能380万吨全球领先，2026Q1净利同比增逾两成", "证券日报2026-04-21：聚氨酯系列毛利率逆势+0.73pct至26.88%", "证券时报2026-07-31：万华东南亚MDI/TDI提价200美元/吨，行业景气上行"], "tier": "观察", "tier_reason": "MDI技术+全球成本壁垒真实、PB处历史极低、股东回报稳定；但当前处周期底部、ROE降至12.4%、杠杆与资本开支高，周期波动大，列观察。", "missing_fields": []}, {"code": "600585.SH", "name": "海螺水泥", "industry": "水泥", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 18.2, "market_cap_yi": 960.4, "pe_ttm": 15.43, "pb": 0.5, "dividend_yield_ttm": 4.07, "pe_pct_10y": 89.81, "pb_pct_10y": 3.27, "roe_5y": {"2021": 19.23, "2022": 8.5, "2023": 5.65, "2024": 4.14, "2025": 4.27}, "gross_margin_latest": 24.16, "gross_margin_trend": "下行后低位企稳（约24%）", "ocf_to_income": 1.93, "debt_ratio": 20.42, "bank_special": null, "dividend_buyback": "2025年度每股派现0.85元+中期0.24元；《未来三年分红回报规划2025-2027》拟2026-2027每年每股不低于0.90元；2026年5月公告6-10亿元A股回购注销；承诺分红+回购不低于当年归母净利50%（上证报2025-09、2026-07）。", "understand": "全国/全球水泥龙头，业务就是开采石灰石—熟料—水泥，成本曲线最左端的玩家。需求与地产/基建高度绑定，中国水泥需求已过峰值、长期缓慢下行，这是一门'现金牛但收缩'的生意。", "good": "护城河是无可争议的成本优势：2025年水泥熟料自产品综合成本同比下降11.12%，在行业下行期仍保持盈利（2025归母净利约82-85亿基本持平）。资产负债率仅20.4%、净现金充裕，经营现金流/经营净收益1.93（重资产折旧）。股东回报持续强化：承诺分红+回购≥50%净利并实施回购注销。", "cheap": "关键是区分指标矛盾：PE分位89.8%（高）但PB仅0.50倍、PB分位3.3%（历史极低）——这是周期股在盈利低谷的典型形态，PE高是因分母(利润)被压缩，不是贵。净现金+高股息(4.07%)+破净，价格已隐含长期悲观预期；但需求长期下行意味着'便宜可能长期便宜'。", "moat": ["成本曲线最左端", "规模与T型战略", "净现金+高分红回购"], "risks": ["需求长期下行：2026H1营收369.27亿(-10.88%)、归母净利25.27亿(-42.76%)、扣非-54.7%，地产拖累未见底", "ROE已从19%降至4.27%，盈利中枢结构性下移", "反内卷/错峰生产政策力度与效果存在不确定性，价格战风险仍在"], "evidence": ["证券日报2026-05-07：2025熟料自产品综合成本同比-11.12%，成本管控成突围关键", "证券时报2026-08-27：2026H1营收-10.88%、归母净利-42.76%，供强需弱", "上证报2026-07-04：2026年5月公告6-10亿元A股回购注销", "海螺集团2026-08-26：拟2026-2027每年每股分红不低于0.90元"], "tier": "观察", "tier_reason": "真成本龙头+净现金+高分红回购，框架允许的成本优势型；但需求长期收缩、ROE降至4%，盈利中枢下移，属'便宜但长期增长缺失'，列观察。", "missing_fields": []}, {"code": "600426.SH", "name": "华鲁恒升", "industry": "煤化工", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 19.13, "market_cap_yi": 526.1, "pe_ttm": 12.83, "pb": 1.51, "dividend_yield_ttm": 2.67, "pe_pct_10y": 39.53, "pb_pct_10y": 5.72, "roe_5y": {"2021": 38.53, "2022": 25.58, "2023": 12.81, "2024": 13.05, "2025": 10.32}, "gross_margin_latest": 19.16, "gross_margin_trend": "周期下行（约19%，高位回落）", "ocf_to_income": 1.02, "debt_ratio": 28.52, "bank_special": null, "dividend_buyback": "2025年中期10派2.5元+年末10派2.5元（另10转3），全年现金分红约15亿元级（公司2025半年报/2025年报摘要）。", "understand": "以水煤浆气化平台为核心的煤化工龙头，产品涵盖尿素、DMF、醋酸、多元醇及新材料，成本与煤价深度绑定。业务可理解但产品矩阵多、盈利随化工景气与煤价周期波动。", "good": "护城河是低成本煤气化平台+荆州第二基地的一体化成本优势，被视为煤化工'成本标杆'。2025营收309.69亿(-9.52%)、归母净利33.15亿(-15.04%)，处周期下行；ROE从2021年38.5%降至10.32%。负债率28.5%稳健，经营现金流/经营净收益1.02匹配。", "cheap": "PE(TTM)12.8倍、近10年PB分位5.7%（历史偏低），PE分位39.5%居中。对照周期底部、资产负债表稳健的煤化工成本龙头，估值不贵；但ROE已回落至10%附近，盈利弹性需等待化工景气回升。", "moat": ["煤气化一体化成本", "荆州基地规模扩张", "低负债"], "risks": ["强周期：化工品价格与煤价价差收窄，2025营收净利双降、ROE降至10.32%", "荆州等新材料项目集中投放，产能释放与下游需求匹配存在不确定性", "产品矩阵较杂，缺乏单一不可替代壁垒，更多是成本领先"], "evidence": ["新浪财经2026-03-30：2025营收309.69亿(-9.52%)、归母净利33.15亿(-15.04%)", "上证报2026-03-31：2025年度10转3派2.5元", "公司2025半年报：中期10派2.5元"], "tier": "观察", "tier_reason": "煤化工成本标杆、低负债、PB历史低位；但处周期底部、ROE回落至10%、产品偏同质化，列观察。", "missing_fields": []}, {"code": "600176.SH", "name": "中国巨石", "industry": "玻纤", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 32.9, "market_cap_yi": 1317.0, "pe_ttm": 21.72, "pb": 3.84, "dividend_yield_ttm": 1.58, "pe_pct_10y": 79.21, "pb_pct_10y": 88.03, "roe_5y": {"2021": 30.15, "2022": 26.52, "2023": 10.91, "2024": 8.37, "2025": 10.62}, "gross_margin_latest": 33.12, "gross_margin_trend": "周期底部回升（约33%）", "ocf_to_income": 1.02, "debt_ratio": 40.41, "bank_special": null, "dividend_buyback": "2025年度10派1.90元，首次实施中期分红，并设回购专户（公司2025年报/业绩说明会2026-03）。", "understand": "全球玻纤（粗纱+电子布）成本规模龙头，产品用于建材、风电、电子等。玻纤是强周期大宗品，价格随产能投放与下游需求大起大落，业务可理解但盈利波动剧烈。", "good": "护城河是全球玻纤规模+成本（含美国、东南亚基地），2025周期回升：营收188.81亿(+19.08%)、归母净利32.85亿(+34.38%)、扣非+94.70%，粗纱与电子布销量创历史新高。经营现金流/经营净收益1.02匹配，首次中期分红+回购。", "cheap": "这是本分片估值最不便宜的成本龙头：PE分位79.2%、PB分位88.0%——周期复苏已被市场充分定价，当前价格隐含了较多景气回升预期。ROE仅10.6%，股息率1.58%偏低。成本优势真实，但'便不便宜'这一关当前不占优。", "moat": ["全球玻纤规模成本", "海外产能（美国/东南亚）", "电子布高端化"], "risks": ["估值处历史高位：PE/PB分位约79%/88%，复苏预期已price-in，若景气反转回撤风险大", "强周期：玻纤粗纱价格随产能投放波动，历史上ROE曾从30%降至8%", "海外关税与贸易壁垒影响出口，电子布面临电子行业周期"], "evidence": ["上证报2026-03-20：2025营收188.81亿(+19.08%)、归母净利32.85亿(+34.38%)、扣非+94.70%", "财联社2026-03-19：玻纤粗纱与电子布销量创历史新高，10派1.9元", "公司业绩说明会2026-03-21：首次实施中期分红、提质增效重回报"], "tier": "观察", "tier_reason": "全球玻纤成本龙头、周期回升、现金流良好；但当前PE/PB历史分位高达79%/88%，复苏已被重估、不便宜，列观察。", "missing_fields": []}, {"code": "603338.SH", "name": "浙江鼎力", "industry": "高空作业平台机械", "cluster": "品牌中药/成本优势制造", "data_date": "2026-10-23", "price": 51.8, "market_cap_yi": 262.3, "pe_ttm": 14.28, "pb": 2.23, "dividend_yield_ttm": 2.22, "pe_pct_10y": 11.63, "pb_pct_10y": 3.78, "roe_5y": {"2021": 20.89, "2022": 19.32, "2023": 23.36, "2024": 17.21, "2025": 17.78}, "gross_margin_latest": 34.26, "gross_margin_trend": "高位小幅回落（约34%）", "ocf_to_income": 0.61, "debt_ratio": 34.26, "bank_special": null, "dividend_buyback": "2025年度10派11.50元合计5.82亿，占归母净利30.66%；上市以来连续分红（上证报2026-04-17、每日经济新闻2026-04-16）。", "understand": "国内高空作业平台（AWP）细分龙头，主营直臂/曲臂/剪叉车，高空作业平台收入占比已升至91.49%，聚焦度高。设备出口为主、内销承压，业务可理解，需求随建筑/租赁行业资本开支周期波动。", "good": "护城河是细分品类的产品力+全球渠道（覆盖100多国，新兴市场子公司扩张）。近5年ROE持续约17%-23%、2025年17.78%达标；2025营收85.75亿(+9.96%)、归母净利18.99亿(+16.60%)。毛利率34%较高，资产负债率34%稳健。", "cheap": "PE(TTM)14.3倍、近10年PE分位11.6%、PB分位3.8%，均处历史低位。对照一家ROE约18%、聚焦全球细分赛道的龙头，估值便宜；但经营现金流/经营净收益仅0.61（应收/备货占用），需跟踪回款质量。", "moat": ["细分产品力", "全球渠道布局", "高聚焦度"], "risks": ["经营现金流/经营净收益0.61低于1，备货与应收占用资金，现金含量待改善", "出口敞口大，美国关税与汇率波动影响（2025Q4含汇兑损失约数千万）", "国内建筑业低迷，呈现'外增内降'，北美高机租赁周期复苏节奏不确定"], "evidence": ["上证报2026-04-17：2025营收85.75亿(+9.96%)、归母净利18.99亿(+16.60%)", "东方财富2026-04-16：高空作业平台收入占比升至91.49%", "每日经济新闻2026-04-16：10派11.5元、支付率30.66%，收入'外增内降'", "公司展会新闻2026-09：销售网络覆盖100多国，加大中东/巴西布局"], "tier": "观察", "tier_reason": "细分全球龙头、ROE持续约18%达标、估值历史低位；但现金流含量偏低(0.61)、出口关税与汇率及内销低迷存不确定性，列观察。", "missing_fields": []}];
+
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function isNA(v){return v===null||v===undefined||v==='';}
+function fnum(v,d){ if(isNA(v)) return '未取到'; return Number(v).toFixed(d==null?2:d);}
+function fna(v,d){ return isNA(v)? '<span class="na">未取到</span>' : Number(v).toFixed(d==null?2:d); }
+function isBank(s){ return isNA(s.gross_margin_latest) && isNA(s.debt_ratio); }
+
+document.getElementById('mTotal').textContent = STOCKS.length;
+
+/* ---------- 总览表 ---------- */
+(function(){
+  var core = STOCKS.filter(function(s){return s.tier==='核心';});
+  var watch = STOCKS.filter(function(s){return s.tier==='观察';});
+  function row(s){
+    var roe = s.roe_5y;
+    var roeStr = [2021,2022,2023,2024,2025].map(function(y){return isNA(roe[y])?'—':roe[y];}).join('/');
+    return '<tr>'+
+      '<td class="name">'+esc(s.name)+'</td>'+
+      '<td>'+esc(s.code)+'</td>'+
+      '<td>'+esc(s.industry)+'</td>'+
+      '<td>'+fnum(s.price)+'</td>'+
+      '<td>'+fnum(s.market_cap_yi,1)+'</td>'+
+      '<td>'+fnum(s.pe_ttm)+'</td>'+
+      '<td>'+fnum(s.pb)+'</td>'+
+      '<td>'+fnum(s.dividend_yield_ttm)+'</td>'+
+      '<td>'+fnum(s.pe_pct_10y)+'</td>'+
+      '<td>'+fnum(s.pb_pct_10y)+'</td>'+
+      '<td title="2021/22/23/24/25">'+roeStr+'</td>'+
+      '<td>'+(s.tier==='核心'?'<span class="tier-badge t-core">核心</span>':'<span class="tier-badge t-watch">观察</span>')+'</td>'+
+    '</tr>';
+  }
+  var html = '<table><thead><tr>'+
+    '<th>名称</th><th>代码</th><th>行业</th><th>最新价</th><th>总市值(亿)</th><th>PE(TTM)</th><th>PB</th><th>股息率TTM%</th><th>PE分位%</th><th>PB分位%</th><th>近5年ROE 21-25</th><th>分层</th>'+
+    '</tr></thead><tbody>';
+  html += '<tr class="group-core"><td colspan="12">核心层 · 商业模式可懂、护城河长期坚固、ROE 持续达标、现金流与分红良好（'+core.length+' 只）</td></tr>';
+  core.forEach(function(s){html+=row(s);});
+  html += '<tr class="group-watch"><td colspan="12">观察层 · 大体符合框架，但存在需持续跟踪的瑕疵（ROE/毛利走低、周期或价格战、估值高位等）（'+watch.length+' 只）</td></tr>';
+  watch.forEach(function(s){html+=row(s);});
+  html += '</tbody></table>';
+  document.getElementById('overviewTable').innerHTML = html;
+})();
+
+/* ---------- 卡片 ---------- */
+(function(){
+  var clusters = ['白酒/食品饮料','家电/消费品牌','公用事业/金融/能源/通信','品牌中药/成本优势制造'];
+  var box = document.getElementById('cardSections');
+  function roeSpark(s){
+    var ys=[2021,2022,2023,2024,2025], vals=ys.map(function(y){return s.roe_5y[y];});
+    var min=Math.min.apply(null, vals.filter(function(v){return !isNA(v);}));
+    var max=Math.max.apply(null, vals.filter(function(v){return !isNA(v);}));
+    var range=(max-min)||1;
+    var bars = ys.map(function(y,i){
+      var v=s.roe_5y[y];
+      if(isNA(v)) return '';
+      var h = 8 + (v-min)/range*34;
+      var cls = v<0?'rb neg':'rb';
+      return '<div class="'+cls+'" style="height:'+h+'px" title="'+y+' ROE '+v+'%">'+v+'</div>';
+    }).join('');
+    return '<div class="roe-row"><span class="rl">近5年ROE%</span><div class="roe-bars">'+bars+'</div></div>';
+  }
+  function bankLine(s){
+    if(!isBank(s)) return '';
+    var b=s.bank_special||{};
+    var txt = '银行/保险不适用毛利率/资产负债率';
+    if(s.code==='601318.SH'){
+      txt += '｜保险口径：'+esc(b.asof||'');
+    } else {
+      txt += '｜不良率'+fnum(b.npl)+'% · 拨备'+fnum(b.coverage)+'% · 净息差'+fnum(b.nim)+'% · 资本充足率'+fnum(b.car)+'%（FY2025）';
+    }
+    return '<div class="bankline">'+txt+'</div>';
+  }
+  clusters.forEach(function(cl){
+    var list = STOCKS.filter(function(s){return s.cluster===cl;});
+    var head = '<div class="cluster-head"><span class="dot"></span><h3>'+esc(cl)+'</h3><span class="cnt">'+list.length+' 只</span></div>';
+    var grid='<div class="cardgrid">';
+    list.forEach(function(s){
+      var tierCls = s.tier==='核心'?'core':'watch';
+      var badge = s.tier==='核心'?'<span class="tier-badge t-core">核心</span>':'<span class="tier-badge t-watch">观察</span>';
+      var moat = (s.moat||[]).map(function(m){return '<span>'+esc(m)+'</span>';}).join('');
+      var risks = (s.risks||[]).map(function(r){return '<li>'+esc(r)+'</li>';}).join('');
+      var ev = (s.evidence||[]).map(function(e){return '<li>'+esc(e)+'</li>';}).join('');
+      grid +=
+      '<div class="card '+tierCls+'">'+
+        '<div class="card-h">'+
+          '<div><div class="nm">'+esc(s.name)+' <span style="font-size:12px;color:var(--muted);font-weight:400">'+esc(s.code)+'</span></div>'+
+          '<div class="ind">'+esc(s.industry)+'</div></div>'+
+          badge+
+        '</div>'+
+        '<div class="metrics">'+
+          '<div class="metric"><div class="ml">最新价</div><div class="mv">'+fnum(s.price)+'</div></div>'+
+          '<div class="metric"><div class="ml">市值(亿)</div><div class="mv">'+fnum(s.market_cap_yi,1)+'</div></div>'+
+          '<div class="metric"><div class="ml">PE(TTM)</div><div class="mv">'+fnum(s.pe_ttm)+'</div></div>'+
+          '<div class="metric"><div class="ml">PB</div><div class="mv">'+fnum(s.pb)+'</div></div>'+
+          '<div class="metric"><div class="ml">股息率%</div><div class="mv">'+fnum(s.dividend_yield_ttm)+'</div></div>'+
+          '<div class="metric"><div class="ml">PE分位%</div><div class="mv">'+fnum(s.pe_pct_10y)+'</div></div>'+
+          '<div class="metric"><div class="ml">PB分位%</div><div class="mv">'+fnum(s.pb_pct_10y)+'</div></div>'+
+          '<div class="metric"><div class="ml">毛利率%</div><div class="mv">'+(isBank(s)?'—':fnum(s.gross_margin_latest))+'</div></div>'+
+          bankLine(s)+
+        '</div>'+
+        roeSpark(s)+
+        '<div class="three">'+
+          '<div class="tri u"><span class="ic">懂</span><div><b>懂不懂：</b>'+esc(s.understand)+'</div></div>'+
+          '<div class="tri g"><span class="ic">好</span><div><b>好不好：</b>'+esc(s.good)+'</div></div>'+
+          '<div class="tri c"><span class="ic">便</span><div><b>便不便宜：</b>'+esc(s.cheap)+'</div></div>'+
+        '</div>'+
+        '<div class="moattags">'+moat+'</div>'+
+        '<div class="dividend"><b>股东回报：</b>'+esc(s.dividend_buyback)+'</div>'+
+        '<div class="risks"><b>风险 / 证伪点</b><ul>'+risks+'</ul></div>'+
+        '<details><summary>证据与来源（'+(s.evidence||[]).length+' 条）</summary><ul>'+ev+'</ul></details>'+
+      '</div>';
+    });
+    grid+='</div>';
+    box.insertAdjacentHTML('beforeend', head+grid);
+  });
+})();
+
+/* ---------- 图表 ---------- */
+var charts=[];
+function mk(id){var c=echarts.init(document.getElementById(id));charts.push(c);return c;}
+
+/* 漏斗 */
+(function(){
+  mk('funnel').setOption({
+    tooltip:{trigger:'item',formatter:'{b}'},
+    series:[{
+      type:'funnel', left:'6%', right:'6%', top:10, bottom:10, width:'88%',
+      sort:'descending', gap:3,
+      label:{show:true,position:'inside',color:'#fff',fontSize:12,lineHeight:16,fontWeight:600,formatter:'{b}'},
+      itemStyle:{borderColor:'#fff',borderWidth:1},
+      data:[
+        {value:5400,name:'A股全市场\n约5400只',itemStyle:{color:'#475569'}},
+        {value:120,name:'量化初筛\n高ROE·稳毛利·现金流·分红',itemStyle:{color:'#0f766e'}},
+        {value:60,name:'三段式论证\n懂 → 好 → 便宜',itemStyle:{color:'#2f8f83'}},
+        {value:36,name:'纳入候选 36 只\n核心8 · 观察28',itemStyle:{color:'#b7791f'}}
+      ]
+    }]
+  });
+})();
+
+/* 图A：PE 分位横向条形 */
+(function(){
+  var arr = STOCKS.slice().filter(function(s){return !isNA(s.pe_pct_10y);})
+    .sort(function(a,b){return a.pe_pct_10y-b.pe_pct_10y;});
+  var names = arr.map(function(s){return s.name;});
+  var vals = arr.map(function(s){return {value:s.pe_pct_10y, itemStyle:{color:s.tier==='核心'?'#b7791f':'#0f766e'}};});
+  mk('chartA').setOption({
+    grid:{left:80,right:30,top:20,bottom:30},
+    tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:function(p){return p[0].name+'：PE分位 '+p[0].value+'%';}},
+    xAxis:{type:'value',max:100,name:'%',splitLine:{lineStyle:{color:'#eee'}}},
+    yAxis:{type:'category',data:names,axisLabel:{fontSize:11,color:'#1c2733'}},
+    series:[{type:'bar',data:vals,barWidth:'60%',
+      markLine:{symbol:'none',data:[{xAxis:50}],lineStyle:{color:'#9a3412',type:'dashed'},label:{formatter:'50%中位',fontSize:10}}
+    }]
+  });
+})();
+
+/* 图B：2025 ROE 柱 + 股息率线 */
+(function(){
+  var arr = STOCKS.slice().sort(function(a,b){return (a.roe_5y['2025']||0)-(b.roe_5y['2025']||0);});
+  var names = arr.map(function(s){return s.name;});
+  var roe = arr.map(function(s){return isNA(s.roe_5y['2025'])?null:Number(s.roe_5y['2025']).toFixed(2);});
+  var dy = arr.map(function(s){return isNA(s.dividend_yield_ttm)?null:Number(s.dividend_yield_ttm).toFixed(2);});
+  mk('chartB').setOption({
+    grid:{left:44,right:44,top:40,bottom:90},
+    tooltip:{trigger:'axis'},
+    legend:{data:['2025 ROE%','股息率TTM%'],top:6,textStyle:{fontSize:11}},
+    xAxis:{type:'category',data:names,axisLabel:{rotate:60,fontSize:10,interval:0}},
+    yAxis:[{type:'value',name:'ROE%',splitLine:{lineStyle:{color:'#eee'}}},
+           {type:'value',name:'股息%',splitLine:{show:false}}],
+    series:[
+      {name:'2025 ROE%',type:'bar',data:roe,itemStyle:{color:'#0f766e'},barWidth:'55%'},
+      {name:'股息率TTM%',type:'line',yAxisIndex:1,data:dy,itemStyle:{color:'#b7791f'},lineStyle:{width:2},symbolSize:5}
+    ]
+  });
+})();
+
+/* 图C：各 cluster 近5年平均 ROE */
+(function(){
+  var clusters=['白酒/食品饮料','家电/消费品牌','公用事业/金融/能源/通信','品牌中药/成本优势制造'];
+  var years=[2021,2022,2023,2024,2025];
+  var colors=['#0f766e','#b7791f','#475569','#7a9e3e'];
+  var series = clusters.map(function(cl,ci){
+    var mem = STOCKS.filter(function(s){return s.cluster===cl;});
+    var data = years.map(function(y){
+      var vals = mem.map(function(s){return s.roe_5y[y];}).filter(function(v){return !isNA(v);});
+      if(!vals.length) return null;
+      return Number((vals.reduce(function(a,b){return a+b;},0)/vals.length).toFixed(2));
+    });
+    return {name:cl,type:'line',data:data,smooth:true,symbolSize:7,lineStyle:{width:2.5},itemStyle:{color:colors[ci]}};
+  });
+  mk('chartC').setOption({
+    grid:{left:44,right:24,top:46,bottom:30},
+    tooltip:{trigger:'axis'},
+    legend:{top:6,textStyle:{fontSize:11}},
+    xAxis:{type:'category',data:years,name:'年度'},
+    yAxis:{type:'value',name:'平均ROE%',splitLine:{lineStyle:{color:'#eee'}}},
+    series:series
+  });
+})();
+
+window.addEventListener('resize',function(){charts.forEach(function(c){c.resize();});});
+</script>
+</body>
+</html>
+<!-- （注：内容由AI生成） -->
