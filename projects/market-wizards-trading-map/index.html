@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>金融怪杰 · 交易智慧图谱</title>
+<style>
+  :root{
+    --bg:#0b1020; --bg2:#101729; --card:#151d33; --card2:#1a2340;
+    --line:#26304f; --txt:#e8ecf6; --sub:#9aa6c4; --muted:#6b7693;
+    --gold:#f0a500; --gold2:#ffc94d;
+    --c-fx:#f0a500; --c-stk:#4d8dff; --c-all:#2fd08a; --c-floor:#b06bff; --c-psy:#ff5ea8;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Source Han Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%, #1a2440 0%, transparent 55%),
+               radial-gradient(1000px 500px at 100% 0%, #221735 0%, transparent 50%),
+               var(--bg);
+    color:var(--txt); line-height:1.7; min-height:100vh;
+  }
+  .wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+
+  /* ---------- Hero ---------- */
+  header.hero{padding:72px 0 40px;text-align:center;position:relative}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:13px;letter-spacing:3px;color:var(--gold);text-transform:uppercase;font-weight:600}
+  .kicker::before,.kicker::after{content:"";width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+  .kicker::after{background:linear-gradient(90deg,var(--gold),transparent)}
+  h1.title{font-size:clamp(30px,5vw,54px);font-weight:800;margin:18px 0 10px;letter-spacing:1px;
+    background:linear-gradient(120deg,#fff 10%,var(--gold2) 50%,#ffd98a 90%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .subtitle{font-size:clamp(15px,2.4vw,19px);color:var(--sub);font-weight:500}
+  .meta{margin-top:16px;color:var(--muted);font-size:14px}
+  .hero-desc{max-width:760px;margin:22px auto 0;color:var(--sub);font-size:15px}
+
+  /* ---------- Stats ---------- */
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 8px}
+  .stat{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
+    border-radius:14px;padding:18px 12px;text-align:center;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+  .stat b{display:block;font-size:34px;font-weight:800;color:var(--gold2);line-height:1}
+  .stat span{display:block;margin-top:8px;font-size:13px;color:var(--sub)}
+  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  /* ---------- Filter ---------- */
+  .filters{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:34px 0 10px;position:sticky;top:0;z-index:30;padding:14px 0;background:linear-gradient(180deg,var(--bg) 0%,rgba(11,16,32,.92) 70%,transparent 100%)}
+  .chip{cursor:pointer;border:1px solid var(--line);background:var(--card);color:var(--sub);
+    padding:9px 18px;border-radius:999px;font-size:14px;transition:.2s;font-weight:500}
+  .chip:hover{color:var(--txt);border-color:#3b4a75;transform:translateY(-1px)}
+  .chip.active{background:linear-gradient(120deg,var(--gold),#ffb52e);color:#1a1400;border-color:transparent;font-weight:700;box-shadow:0 6px 20px rgba(240,165,0,.35)}
+  .chip .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:7px;vertical-align:1px}
+
+  /* ---------- Mindmap ---------- */
+  .map-card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
+    border-radius:18px;padding:18px;margin:20px 0;box-shadow:0 14px 40px rgba(0,0,0,.3)}
+  .sec-h{font-size:19px;font-weight:700;margin-bottom:4px;color:var(--txt)}
+  .sec-s{font-size:13px;color:var(--muted);margin-bottom:14px}
+  #mindmap{width:100%;height:auto;display:block}
+  .mm-label{font-size:12px;font-weight:600;pointer-events:none}
+  .mm-cat{font-size:13px;font-weight:700}
+  .mm-node{cursor:pointer;transition:opacity .2s}
+  .mm-node:hover{opacity:.85}
+  .mm-link{stroke-opacity:.5}
+
+  /* ---------- Cards ---------- */
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:18px;margin:14px 0 8px}
+  .card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);
+    border-radius:16px;padding:22px;position:relative;overflow:hidden;transition:.25s;
+    box-shadow:0 10px 30px rgba(0,0,0,.22);display:flex;flex-direction:column;gap:12px}
+  .card:hover{transform:translateY(-4px);border-color:#3b4a75;box-shadow:0 18px 44px rgba(0,0,0,.36)}
+  .card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--cat, var(--gold))}
+  .card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+  .name-cn{font-size:20px;font-weight:800;line-height:1.25}
+  .name-en{font-size:12.5px;color:var(--muted);font-weight:500;margin-top:2px}
+  .badge{flex:0 0 auto;font-size:11.5px;font-weight:700;color:#1a1400;background:var(--cat);padding:4px 10px;border-radius:999px;white-space:nowrap}
+  .tagline{font-size:13px;color:var(--gold2);font-style:italic;margin-top:1px}
+  .philo{font-size:14px;color:#dfe6f6;background:rgba(255,255,255,.04);border-left:3px solid var(--cat);
+    padding:10px 13px;border-radius:8px}
+  .block{font-size:13.5px}
+  .block h4{font-size:12.5px;font-weight:700;color:var(--sub);letter-spacing:1px;margin-bottom:6px;text-transform:uppercase}
+  .block ul{list-style:none}
+  .block li{padding:3px 0 3px 18px;position:relative;color:#cdd6ec}
+  .block li::before{content:"";position:absolute;left:2px;top:11px;width:6px;height:6px;border-radius:50%;background:var(--cat)}
+  .quotes{background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.22);border-radius:10px;padding:10px 14px}
+  .quotes h4{font-size:12.5px;font-weight:700;color:var(--gold2);letter-spacing:1px;margin-bottom:6px}
+  .quotes p{font-size:13.5px;color:#f3e9c8;margin:5px 0;padding-left:14px;position:relative}
+  .quotes p::before{content:"“";position:absolute;left:0;top:-2px;color:var(--gold);font-size:16px}
+  .quotes p::after{content:"”";color:var(--gold);font-size:15px}
+  .lesson{font-size:13px;color:#b9c4df;border-top:1px dashed var(--line);padding-top:10px}
+  .lesson b{color:var(--gold2)}
+  .card.hidden{display:none}
+
+  /* ---------- Common wisdom ---------- */
+  .section{margin:44px 0}
+  .section>.sec-h{font-size:24px;text-align:center;margin-bottom:6px}
+  .section>.sec-s{text-align:center;margin-bottom:24px}
+  .two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  @media(max-width:860px){.two-col{grid-template-columns:1fr}}
+  .panel{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:16px;padding:22px}
+  .panel h3{font-size:16px;margin-bottom:14px;color:var(--gold2);display:flex;align-items:center;gap:9px}
+  .panel h3 .n{width:26px;height:26px;border-radius:8px;background:rgba(240,165,0,.14);color:var(--gold2);display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:800}
+  .trait{padding:9px 4px;border-bottom:1px solid var(--line);font-size:14px;color:#d7deef}
+  .trait:last-child{border-bottom:none}
+  .trait b{color:var(--txt)}
+  .principle{padding:9px 4px;border-bottom:1px solid var(--line)}
+  .principle:last-child{border-bottom:none}
+  .principle h5{font-size:14px;color:var(--txt);font-weight:700}
+  .principle p{font-size:12.8px;color:var(--sub);margin-top:2px}
+
+  /* ---------- Theme chart ---------- */
+  .bars{display:flex;flex-direction:column;gap:10px}
+  .bar-row{display:grid;grid-template-columns:130px 1fr 42px;align-items:center;gap:12px}
+  @media(max-width:560px){.bar-row{grid-template-columns:92px 1fr 34px}}
+  .bar-label{font-size:13.5px;color:#d7deef;text-align:right;font-weight:600}
+  .bar-track{background:rgba(255,255,255,.05);border-radius:8px;height:22px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:8px;background:linear-gradient(90deg,var(--gold),#ffb52e);width:0;transition:width 1s cubic-bezier(.2,.7,.3,1);display:flex;align-items:center;justify-content:flex-end;padding-right:8px;font-size:11.5px;font-weight:700;color:#1a1400}
+  .bar-num{font-size:13px;color:var(--sub);font-weight:700}
+
+  footer{margin:60px 0 40px;text-align:center;color:var(--muted);font-size:12.5px;line-height:2}
+  .foot-note{max-width:640px;margin:0 auto}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <span class="kicker">Market Wizards · Trading Wisdom Map</span>
+    <h1 class="title">金融怪杰 · 交易智慧图谱</h1>
+    <div class="subtitle">《华尔街的顶级交易员》——18 位顶级交易者的核心理念与策略全景</div>
+    <div class="meta">杰克·D·施瓦格 著 · 机械工业出版社</div>
+    <p class="hero-desc">施瓦格访谈了 18 位用各自方法赚取惊人回报的「金融怪杰」。他们风格迥异——从纯技术到纯基本面，从日内剥头皮到长线持仓——却共享着惊人的交易态度共性。本图梳理每位交易者的核心理念、策略方法、风险哲学与金句，并提炼贯穿全书的共同智慧。</p>
+    <div class="stats">
+      <div class="stat"><b>18</b><span>位顶尖交易者</span></div>
+      <div class="stat"><b>5</b><span>大交易领域</span></div>
+      <div class="stat"><b>9</b><span>条共同特质</span></div>
+      <div class="stat"><b>17</b><span>条交易准则</span></div>
+    </div>
+  </header>
+
+  <nav class="filters" id="filters"></nav>
+
+  <section class="map-card">
+    <div class="sec-h">交易者全景图</div>
+    <div class="sec-s">中心为「成功交易」，按领域分成五支，悬停或点击节点可查看/定位到对应卡片</div>
+    <svg id="mindmap" viewBox="0 0 1000 620" preserveAspectRatio="xMidYMid meet"></svg>
+  </section>
+
+  <section class="section">
+    <div class="sec-h">人物卡片</div>
+    <div class="sec-s">按领域筛选，点击顶部标签切换</div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <section class="section">
+    <div class="sec-h">全书共同智慧</div>
+    <div class="sec-s">施瓦格在「最后的话」与「22 年后的观点」中亲自提炼的成功者共性</div>
+    <div class="two-col">
+      <div class="panel">
+        <h3><span class="n">9</span> 所有怪杰的共同特质</h3>
+        <div class="trait"><b>① 强烈欲望：</b>都有成为成功交易者的强烈欲望与内在驱动力，多数人为此克服了重重艰难。</div>
+        <div class="trait"><b>② 自信：</b>对长期持续盈利充满自信，几乎都把自有资金视为最好、最安全的投资方式。</div>
+        <div class="trait"><b>③ 纪律：</b>每人都找到适合自己的方法并坚持使用，「纪律」是被提及频率最高的词。</div>
+        <div class="trait"><b>④ 认真：</b>对待交易极为严肃，除睡眠外大部分时间用于分析市场、制定策略。</div>
+        <div class="trait"><b>⑤ 风险控制：</b>「严格的风险控制」是所有受访者交易策略中最关键的要素。</div>
+        <div class="trait"><b>⑥ 耐心：</b>大多数受访者都强调耐心等待交易机会的重要性。</div>
+        <div class="trait"><b>⑦ 独立：</b>交易时必须保持独立、不随波逐流。</div>
+        <div class="trait"><b>⑧ 接受亏损：</b>都懂得「损失就是交易游戏的一部分」。</div>
+        <div class="trait"><b>⑨ 热爱：</b>所有受访者都热爱他们所从事的交易事业。</div>
+      </div>
+      <div class="panel">
+        <h3><span class="n">17</span> 条历经 22 年不变的交易准则</h3>
+        <div class="principle"><h5>1. 好交易 ≠ 盈利交易</h5><p>按「决策是否正确」而非单笔结果评判；好决策也会亏钱，坏决策也可能赚钱。</p></div>
+        <div class="principle"><h5>2. 执行与决策同样重要</h5><p>研判正确只是成功的一半，正确的执行才是关键。</p></div>
+        <div class="principle"><h5>3. 研判正确也未必赚钱</h5><p>建仓、加仓、清仓环节出错，照样无法盈利。</p></div>
+        <div class="principle"><h5>4. 有时需要离场观望</h5><p>「音符间的空白造就音乐」——没机会就不要参与，耐心至关重要。</p></div>
+        <div class="principle"><h5>5. 风险控制是理所当然</h5><p>许多怪杰认为风控比交易方法还重要。</p></div>
+        <div class="principle"><h5>6. 交易规模比进场点更重要</h5><p>仓位过重会被恐惧支配，仓位过小又会错失良机。</p></div>
+        <div class="principle"><h5>7. 不力求百分之百正确</h5><p>部分清仓是「全留或全清」之外的第三种选择。</p></div>
+        <div class="principle"><h5>8. 围绕持仓反复加减仓</h5><p>动态调整头寸可提高绩效、更易持盈。</p></div>
+        <div class="principle"><h5>9. 赢家具有灵活性</h5><p>不固守想法，研判有误或形势有变就主动认错离场。</p></div>
+        <div class="principle"><h5>10. 连续亏损的最佳补救</h5><p>全部清仓、停止交易、休息数日，重来后保持小仓位。</p></div>
+        <div class="principle"><h5>11. 波动性 ≠ 风险</h5><p>最严重的风险往往不反映在历史波动率中。</p></div>
+        <div class="principle"><h5>12. 直觉并无神秘可言</h5><p>直觉是基于过往经验的潜意识活动，可信则信。</p></div>
+        <div class="principle"><h5>13. 顺风顺水时要小心</h5><p>最严重的亏损常尾随最好的业绩而来，须戒骄。</p></div>
+        <div class="principle"><h5>14. 与市场同时恐慌时离场</h5><p>加速下跌、人人恐慌时，落袋为安是明智之举。</p></div>
+        <div class="principle"><h5>15. 进场价位市场无所谓</h5><p>别为「打平保本」死扛，微亏常酿成大亏。</p></div>
+        <div class="principle"><h5>16. 别设年度盈利目标</h5><p>机会大时目标会让你畏首畏尾，机会少时又逼你勉强交易。</p></div>
+        <div class="principle"><h5>17. 成功之路不止一条</h5><p>关键是找到适合自己个性特点的方法，而非复制他人。</p></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="sec-h">高频主题</div>
+    <div class="sec-s">18 位交易者中被反复强调的核心主题（按访谈提及频次归纳）</div>
+    <div class="panel"><div class="bars" id="bars"></div></div>
+  </section>
+
+  <footer>
+    <div class="foot-note">本图谱根据杰克·D·施瓦格《金融怪杰：华尔街的顶级交易员》（机械工业出版社）全书访谈内容整理，金句均为书中原话。<br>仅供学习交流，不构成任何投资建议。</div>
+  </footer>
+</div>
+
+<script>
+const CAT = {
+  fx:{key:"期货与外汇", color:"#f0a500"},
+  stk:{key:"股票", color:"#4d8dff"},
+  multi:{key:"全品种", color:"#2fd08a"},
+  floor:{key:"场内交易员", color:"#b06bff"},
+  psy:{key:"交易心理与革新", color:"#ff5ea8"},
+};
+
+const DATA = [
+  {cn:"迈克尔·马库斯", en:"Michael Marcus", cat:"fx", tag:"绝不重蹈覆辙",
+   philo:"追随趋势是赚钱的根本，但必须「截断亏损」与「让利润奔跑」并重；最佳交易须基本面、技术面、市场心理三方面同时有利；交易是完全私人的事，必须独立判断。",
+   strategy:["三合一选品种：只做基本面、技术面、市场基调三者全部一致的交易，仓位放大 5~6 倍","金字塔式加仓与持盈，上涨途中兑现部分利润","看「背离」进出场：利多消息价格却不涨就做空","用连续涨跌停的「疯狂程度」判断顶部，几乎总在第四个涨停清仓","日内冲浪：关键价位建大仓、设极近止损"],
+   risk:["单笔交易投入不超过总资金的 5%","永远用实际止损价位而非心理止损","疑虑、看不懂时就清仓离场","绝不孤注一掷，头寸规模永远不能太大"],
+   quotes:["交易时不要孤注一掷。","最重要的交易法则也许就是持盈和止损。","当你疑虑重重时，那就清仓离场，睡个好觉。"],
+   lesson:"不止一次把本金亏光，真正让他脱胎换骨的是把仓位控制在永远打不死自己的程度，并坚持止损与持盈并重。"},
+
+  {cn:"布鲁斯·科夫纳", en:"Bruce Kovner", cat:"fx", tag:"驰骋全球的交易者",
+   philo:"以基本面为主、技术为辅——「除非搞懂价格变动的原因，否则不会建仓」；构建多种未来情景假设，等待市场验证；最看重风险管理与相关性控制，「不懂就离场」。",
+   strategy:["基本面+技术面融合，等价格突破作为确认信号后再跟进","突破的可靠性看盘整：盘整越久越稳固、越没人理解缘由，风险报酬比越好","止损设在盘整区间（支撑/阻力）之外，避免被震荡洗出","寻找市场尚未形成共识的反向机会，把权威一致看法当反向参考","构建预期区间，助手按预设方案执行 24 小时全球交易"],
+   risk:["单笔风险不超过组合市值的 1%","每天用计算机分析持仓相关性，正相关头寸等于放大风险","情绪失衡、认知困惑时清空所有相关头寸","不要莫名其妙地亏大钱——不懂就不做"],
+   quotes:["交易的首要法则……不要莫名其妙地亏大钱，不懂就不做。","技术分析就像体温表。","越不为人关注的地方，越有好的交易机会。"],
+   lesson:"冲动交易是致命伤；1981 年因持仓高度正相关而巨亏，从此把「组合相关性风险管理」作为核心制度。"},
+
+  {cn:"理查德·丹尼斯", en:"Richard Dennis", cat:"fx", tag:"退隐的传奇交易员",
+   philo:"市场有趋势就追随，「价格趋势越强越好」；交易本质是概率游戏，要始终做好最坏打算；好的趋势系统只跟随趋势、永不设定价格上下限。",
+   strategy:["顺势进场，判断早晚看市场对消息的反应","强势收盘信号：周五收在当日最高价就不持亏损空头过周末","亏损头寸一两周仍亏即判断做错，犯错立刻止损","反人性的纪律：别人在涨停板兑现时他进场","全品种通用——「我进行交易，不必知道交易市场的名字」"],
+   risk:["投入资金要少，做好最坏打算","亏损时降仓、立即止损，把资金留到少数能短期赚大钱的时候","不被账户净值逐日波动误导，关注操作是否正确"],
+   quotes:["你必须追随趋势，而且价格趋势越强越好。","在交易这行，你无法预期到的事和你认为不可能发生的事常常都会发生。","你就是把交易法则都登在报纸上，这些法则也没人会遵从的。"],
+   lesson:"自估 95% 的盈利来自 5% 的交易，错失巨大盈利机会是最严重的错误；犯错失利时正是彻底反思的时候。"},
+
+  {cn:"保罗·都铎·琼斯", en:"Paul Tudor Jones", cat:"fx", tag:"积极交易的艺术",
+   philo:"交易制胜的关键在于第一流的出色防守，而非进攻；最好赚钱的时刻在价格转折点，做波段而非吃趋势中段；观点极度灵活，一旦证明错了立即转向。",
+   strategy:["逆向/波段交易：在价格转折点进场，设窄止损","用历史模拟（如 1929 年崩盘模型）判断当下","分步成交、逐步离场","价格先于基本面反应，先听市场自身的声音","时间止损+价格止损：到止损位或到时限仍未突破就平仓"],
+   risk:["从不看能赚多少，只看可能亏多少","按月控制回撤：当月已跌 6.5% 就把剩余止损设在再跌 3.5%","净资产跌 1~2% 就清仓观望","亏损时持续减仓、盈利时加仓，绝不摊平亏损"],
+   quotes:["交易制胜的关键在于第一流的出色防守，而非第一流的出色进攻。","不要摊平亏损。","不要把注意力集中在赚他人钱上，而要专注于保护自己的钱。"],
+   lesson:"1979 年棉花交易单笔亏掉账户 60%~70% 几乎致命，从此把风险控制永远放在第一位。"},
+
+  {cn:"盖瑞·贝弗德", en:"Gary Bielfeldt", cat:"fx", tag:"皮奥里亚的长期国债期货交易者",
+   philo:"不相信分散交易，主张选定并专攻某一领域成为专家；以基本面分析为主，辅以自建趋势跟踪系统纠错；核心法则是「持盈止损」。",
+   strategy:["基本面为主（能把握 80% 已很出色），用趋势跟踪系统作反馈提示离场","建议资金一分为二：一半交系统、一半用自己判断","国债基本面要素排序：经济＞通胀预期＞美元＞贸易收支＞财政赤字","抄底分批试仓，价格不利 0.5~1.5 点就止损，再等合适价位重新进场","持盈靠纪律与耐心，把长期目标与保护性止损结合"],
+   risk:["价格向不利方向移动 0.5~1.5 点即止损","迅速清空亏损品种，止损毫不犹豫、坦然认错","新手起步别盲目冒险，用少量资金试水"],
+   quotes:["持盈止损。","那是因为他们过度交易。","如果市场上每一个人都看多美元……你就要有勇气力排众议，大胆入场。"],
+   lesson:"成功交易者最需要恪守纪律与耐心——耐心等待胜率极高的机会，耐心持有盈利头寸。"},
+
+  {cn:"艾迪·塞柯塔", en:"Ed Seykota", cat:"fx", tag:"人人都能如愿以偿",
+   philo:"交易心理与市场分析合二为一（心理是司机、分析是地图）；成功源于对交易的真正热爱；把资金管理技巧融入交易系统，才是长期生存盈利的关键。",
+   strategy:["系统脱胎于唐奇安均线（改用指数平滑平均），受《股票作手回忆录》影响极深","「交易系统无须改换」，诀窍在对适合自身的系统不断修改发展","体系三要素：长期趋势＞图表形态＞好价位（基本面重要性最低）","不抄底、不寻顶，追涨追跌，在动能最充沛时建仓","依据交易业绩调整仓位：盈利后加大、亏损后降低"],
+   risk:["成功交易三要素：止损、止损、止损","单笔交易最大风险不超过账户净资产的 5%","连续亏损时减少交易、场外休息，急于翻本会致命"],
+   quotes:["有交易老手，有大胆无畏的交易者，但罕有大胆无畏的交易老手。","解读技术走势图有点像冲浪。","盈利还是亏损，每个人都从市场中得到他想要的东西。"],
+   lesson:"先找到自己真正热爱的事——若不是真正热爱交易，就不可能成为杰出的交易者。"},
+
+  {cn:"拉里·海特", en:"Larry Hite", cat:"fx", tag:"重视风险",
+   philo:"市场是无效的（「市场或许会改变，但人性不会变」）；成功投资本质与概率有关，用统计方法测试系统、借大数法则获胜；核心信条是「只盯住风险」。",
+   strategy:["始终顺应趋势、绝无例外，公司订有书面协定、无人能违背系统信号","用统计大数法则测试系统（持仓 6 个月胜率约 90%、12 个月约 99%）","在全球近 60 个市场、多套低相关系统间分散交易","跟踪各市场波动率，风险回报比低于规定水平就停止该市场交易","设信号可信度三色灯：绿灯全做、黄灯只减不开新仓、红灯清仓观望"],
+   risk:["第一法则：任何一笔交易所冒风险不超过账户净资产的 1%","生活开支的钱永不投入交易","对风险定量分析——知道最坏结果，抉择和行动才有极大自由"],
+   quotes:["我不是为了刺激、兴奋而交易；我交易是为了赚钱盈利。","如果你不敢进场下注，那你就不可能赢；如果你的筹码全都输光了，你就不能再下注。","市场或许会改变，但人不会变，人性不会改变。"],
+   lesson:"敬畏并量化风险比预测市场方向更重要——不懂风险控制，蕴含的风险迟早会让人遭殃。"},
+
+  {cn:"迈克尔·斯坦哈特", en:"Michael Steinhardt", cat:"stk", tag:"与众不同的理念和方法",
+   philo:"保持与众不同的观点，一直持有到该观点不再与众不同；市场没有固定不变的盈利模式，试图把成功公式化的人，在获利的同时也埋下了失败的种子。",
+   strategy:["在机构趋之若鹜时逆向做空，常做空太早、初始亏损，但基本面不变就继续持有","完全不用技术图表、止损单、突破信号，只靠密切观察形成「感觉」","每天核查组合多达六遍，做「对组合缺失进行批评的监督者」","假定交易对家知道的不比自己少，总追问「对方为何卖」","灵活调整净持仓（平均净多 40%，范围净空 15~20% 到净多超 100%）"],
+   risk:["不用止损单，但利空新闻兑现或亏损大到无法承受即清仓","逆向交易需选对时机、仓位恰到好处、有勇气并了解自身心理承受力","1987 年 10 月重仓做多亏超 20% 后，减仓持币观望"],
+   quotes:["我力图形成我确信的，并且与市场普遍看法有所不同的观点。","要想在市场中赚钱，你不得不承担风险。","处理一个错误即可，不要犯两个错误。"],
+   lesson:"交易没有一劳永逸的公式，成功要求「既坚信自己的看法，又保持弹性、承认何时犯错」的平衡。"},
+
+  {cn:"威廉·欧奈尔", en:"William O'Neil", cat:"stk", tag:"选股的艺术",
+   philo:"牛股暴涨前具备七大共性（CANSLIM），选股标准必须极严（符合者＜2%）；「所有股票都是坏的，除非股价上涨」；制胜不在时时正确，而在出错时少输钱。",
+   strategy:["CANSLIM：当季 EPS 增 20%~50%、五年年均复合增约 24%、有新生事物、流通盘小、相对强弱＞80、机构认可度适中、顺应大盘","买点：股价脱离底部创「相对新高」时买，距底涨超 10% 不追","做空只在整体市场见顶信号后，最佳形态是第三/四个整理区间向上突破失败"],
+   risk:["任何股票最大亏损绝不超过 7%，「决不猜测，决不犹豫」","做空同样在亏损 6%~7% 止损，从不承担无限风险","连续亏损五六次就离场观望"],
+   quotes:["所有的股票都是坏的。除非股价能够上涨，否则就不是好股票。","大钱从来不是靠你思考得来的，而是靠你坐着得来的。","如果你不愿「截断亏损」，那你就不应购买股票。"],
+   lesson:"交易成功 = 有效的选股过程 + 严格的风险控制 + 确保做到前两项的纪律。"},
+
+  {cn:"大卫·瑞安", en:"David Ryan", cat:"stk", tag:"投资股票如同探寻宝藏",
+   philo:"「买得虽高，但能卖得更高」，只找每股收益与图表上「最最强势」的股票集中持有；拒绝低买高卖，通常不买 10 美元以下股票。",
+   strategy:["层层筛选：看图初选（一周近 4000 张）→相对强弱/EPS 排名＞80→行业前 50→流通盘小→机构持股 1%~20%→有「新东西」，砍到约 7 只","创新高时立即买入，要求突破当日成交量成倍放大","不设目标价，持有到构筑整理平台并向下突破才卖出","大牛股持 6~12 个月、普通股约 3 个月、亏损股不超两周","坚持写交易日志，记录每笔买卖理由"],
+   risk:["单笔最大亏损 7%，清仓亏损股非常快","创新高后重回盘整区，立即减至少 50% 仓位","用手头个股表现与道指—腾落指数背离确认熊市"],
+   quotes:["买得虽高，但能卖得更高。","从你自己所犯的错误中学习。","对我而言，股票交易如同探寻宝藏。"],
+   lesson:"方法本身不足以成功，必须严格恪守纪律；违反自己的准则必致亏损。"},
+
+  {cn:"马丁·舒华兹", en:"Marty Schwartz", cat:"stk", tag:"交易比赛的冠军",
+   philo:"转向技术分析后从十年亏损变常胜将军，关键在于「找到适合自己」的方法；把市场当竞技场、保持独立主见；最重资金管理，而非赚得最多。",
+   strategy:["建仓前必看移动平均线，绝不逆均线而动","寻找大盘创新低而个股未创新低的背离","自创并综合多指标，找高概率低风险进场点","建仓前自问是否真建仓，并明确认输离场点","大赢之后主动降低交易规模，而非赢后加码"],
+   risk:["止损极快是成功关键","每月净资产最大回撤不超过 3%，90% 以上月份盈利","巨亏后把总头寸缩减到正常规模的 1/5~1/10","绝不在亏损头寸上加码翻本"],
+   quotes:["交易中最重要的事就是保存足够的实力，等待反扑的时机。","让自尊心见鬼去吧，赚钱才是最重要的。","资金管理、资金管理、资金管理。"],
+   lesson:"找到适合自己的方法，并把交易盈利与「证明自己正确」的渴望彻底分开。"},
+
+  {cn:"范·K·撒普博士", en:"Dr. Van K. Tharp", cat:"psy", tag:"交易心理学",
+   philo:"交易成败的关键几乎不在技术分析方法，而在心理状态、信念与心理策略；金融市场如同大自然，只会让参与者暴露自身问题而不会替其解决；「怎样取得成功」才是头等大事。",
+   strategy:["投资心理数据库：成功要素归纳为心理、决策、自我管理三大类 11 个方面","关键发现：技术分析的掌握与交易成功关联极小，赚钱动机关联也不显著","复制成功 = 复制信念 + 心理状态 + 心理策略（用 NLP 技巧）","顶尖交易者五大信念：钱不重要、坦然接受亏损、交易是游戏、心理演练重要、未战先胜","指出交易失败的四大心理障碍：对风险态度糟糕、压力、内心冲突、情绪化交易"],
+   risk:["投机交易的两条基本成功法则：「截断亏损」与「让利润奔跑」","大多数人恰好相反——「截断盈利，让亏损奔跑」","视交易为游戏，把止损持盈当作游戏规则，每天重温回顾"],
+   quotes:["金融市场如同大自然，它只会让参与者显现暴露自身的问题，而不会去解决这些问题。","人若全力以赴，天将遂人心愿。","大多数人是「截断盈利，让亏损奔跑」。"],
+   lesson:"交易成功首先是心理问题——要对自己业绩负责，从内因找原因，并全力以赴、按交易系统信号行事。"},
+
+  {cn:"爱德华·索普", en:"Edward Thorp", cat:"psy", tag:"革新者",
+   philo:"以数学和概率统计寻找正期望值，用「非赌博的方式」来进行赌博并战胜对手；极端风险厌恶，追求有数学优势的稳定盈利而非碰运气。",
+   strategy:["研发 21 点算牌、下注系统，并出版《打败庄家》","发现权证定价偏差，1967 年与卡索夫合著《战胜市场》","研究出期权定价公式，堪称 Black-Scholes 模型的前身","1969 年创立普林斯顿-纽波特合伙公司——世界第一只量化对冲基金、市场中性策略基金"],
+   risk:["极端风险厌恶，成长于大萧条时代塑造了其厌恶风险的态度","刻意控制赌注规模（每小时只赚约 100 美元，避免触怒赌场）","优势来自数学模型与概率统计的正期望值，而非运气"],
+   quotes:["以「非赌博的方式」来进行赌博，并且能够战胜赌场。","华尔街的金融交易其实就是赌博的一种，而且是最大的赌博项目。"],
+   lesson:"真正的优势来自可量化、可验证的数学模型与正期望值，而非运气或情绪。"},
+
+  {cn:"吉姆·罗杰斯", en:"Jim Rogers", cat:"multi", tag:"具有价值时买，市场狂热时卖",
+   philo:"投资时要学会「绝对的无所事事」，耐心等待直到确实该动手时再行动；只在资产具有价值时买入，等待「催化剂」出现，逆市场疯狂而行；「市场几乎总是错的」，必须独立思考、摒弃传统智慧。",
+   strategy:["价值买入＋催化剂：1982 年因德国股市盘整 21 年、价值明显，加之政党轮替这一催化剂而做多","逆市场疯狂而行：黄金 675 美元做空、大豆 9.60 美元做空、1987 年崩盘前做空股票","以基本面分析为主，技术图表只用于发现催化剂与察觉市场疯狂，绝不用于预测","全品种、全球市场，多空兼顾、同时持多空头寸对冲风险","交易次数极少：一年只做三五次决策，建仓后持仓数年"],
+   risk:["买在有价值处，即使出错也亏不多","同时持有多空头寸对冲风险","基本面根本改变则立即止损——「最初的亏损就是最好、最小的亏损」","不买期权，做空时宁可卖出看涨期权"],
+   quotes:["我会等到钱已放在墙角，然后再走过，俯身拾起，与此同时，此前此后，我什么都不用做。","任何人都能学会的一条投资法则……投资时要学会无所事事，绝对的无所事事。","市场几乎总是错的。"],
+   lesson:"市场会涨过头、跌过头，幅度都超出预想；早年孤注一掷亏光，教训是「除非你对你所做的事非常了解，否则就不要去做」。"},
+
+  {cn:"马克·温斯坦", en:"Mark Weinstein", cat:"multi", tag:"高胜算交易者",
+   philo:"耐心等待交易良机，等万事皆备、所有因素都对自己有利、胜算极高时才进场；敬畏市场，靠交易经验与直觉选择时机；寻找动能正在丧失的市场反向操作，只赚中间一段动能最足的行情。",
+   strategy:["高胜算等待：像猎豹潜伏、只在必胜时出击，像麻雀快速叼食","寻找动能丧失的市场反向而行：上涨动能丧失就做空，下跌动能丧失就做多","综合多技术工具（波浪、江恩、斐波那契、周期、情绪、均线、摆动指标）并适时切换","自研电脑交易系统＋实时盘面分析与直觉，本人就是「交易系统」","让市场告诉他方向，不预测，盯个股性格"],
+   risk:["无正式风控，靠本能：感觉头寸出错就立即清仓","极高胜率：1980 年以来周周盈利，数千笔仅 17 笔亏损","止损要快、持盈要久"],
+   quotes:["当天仍然漆黑一片的时候，他们还会走进森林，而我则会等到天亮，然后再走进森林。","我依靠个人的交易经验和我的神经系统来选择交易的时机。","你必须学会怎么面对失败，这比学会怎样取得胜利更为重要。"],
+   lesson:"不要为具体物质目标设定盈利目标，否则会忽视风险、仓位过重；面对失败比追求胜利更重要。"},
+
+  {cn:"布莱恩·吉尔伯", en:"Brian Gelber", cat:"floor", tag:"从经纪人到交易者",
+   philo:"对市场「有一个观点」并不重要，聆听市场声音、观察市场动态才更重要；要做「对市场变化随时反应和调整」的交易者，而非死抱观点；市场才是正确的，绝不盲从他人。",
+   strategy:["靠解读盘面和交易直觉交易，早期作为大资金玩家甚至能自行建立支撑位/阻力位","每天与约 25 个交易者交谈，倾听并解读其行为，逆失败交易者的方向操作","主观交易：技术指标与系统只是工具，最终靠主观判断","以逆趋势交易见长，后来也适时追随趋势","做错方向时耐心等待离场机会，把亏损尽量缩小"],
+   risk:["连续亏损时本能降低规模、暂停交易、清掉所有头寸重新开始","年初逐步加仓，用赚来的钱再交易","在亏损的头寸上绝对不要加码"],
+   quotes:["对市场具有一个观点并不很重要，聆听市场的声音、观察市场的动态才更为重要。","我不害怕亏损。当你开始害怕亏损，你就输定了。","我观点的对或错并不重要。我能否赚到钱才是重要的。"],
+   lesson:"大多数失败者败在自尊心太强、不愿认错，或对亏损过于忧虑；市场才是正确的。"},
+
+  {cn:"汤姆·鲍德温", en:"Tom Baldwin", cat:"floor", tag:"无所畏惧的场内交易员",
+   philo:"持仓时间越短，承受的风险越小，「风险最小化」始终是交易目标；必须完全漠视金钱、不为钱而交易，金钱只是计分工具；机会和运气只留给有准备、肯努力的人。",
+   strategy:["剥头皮交易为主（90% 以上）：持仓以分钟甚至秒钟计，重仓品种平均赚 4 个刻度","从 1 手做起逐步放大（1→5→10→20→50→100 手），用反复观察到的市场模式交易","用过去六个月的棒状图形成短期观点，关注周高低点、50% 回调位、盘整区间","间接用基本面：观察市场对最新信息的反应，争做第一个利用信息交易的人","借鉴优秀交易者：自己想做空而优秀者做多时，会犹豫甚至放弃"],
+   risk:["以缩短持仓时间最小化风险","止损有耐心：不当场立即止损，等最佳离场时机；账面亏损达一定程度才立即离场","绝不把盈亏数字转换成有形的实物"],
+   quotes:["持仓时间越短，承受的风险也就越小。「风险最小化」始终是交易要实现的目标。","在交易这行，你必须完全漠视金钱，不能把钱看得太重。","人越聪明，在交易中就越愚笨；知道得越多，对你的交易越是不利。"],
+   lesson:"大多数人败在交易过于频繁、不耐心等待良机；一旦开始考虑金钱得失，你就死定了。"},
+
+  {cn:"托尼·萨利巴", en:"Tony Saliba", cat:"floor", tag:"「一手」制胜",
+   philo:"控制风险、做足功课、恪守纪律，对最坏情况事先知晓并提前防范；用期权策略（多头蝶式套利＋「爆发式头寸」）捕捉大行情并限制风险；头脑清楚、纪律严明、灵活机动、敬畏市场。",
+   strategy:["期权组合：靠前月份做多头蝶式套利吃时间价值，中间及后月建「爆发式头寸」（虚值看涨＋虚值看跌）","只需正确判断波动率，不必预测价格方向，通常保持 delta 中性","逐步加仓、逐步减仓分散风险，早年期权上一次只交易一手","做足功课：列出所有「将来可能发生的情况」，提前规划而非事后回应","每天「重新开始」：持仓充分对冲，如同空仓，随时捕捉机会"],
+   risk:["严格控制风险、限制亏损，亏损时清仓或采取中性策略对冲","不在亏损头寸加码——「不能在漏水的船上再挖洞」","逐步加减仓分散风险，崩盘后取出盈利买入国库券、年金"],
+   quotes:["交易成功的要素就是「头脑清楚，思路清晰，全神贯注，纪律严明」。","当你所坐的船出现裂缝，水已渗入时，你不能为了排水而在船身上再挖一个洞。","要预期未来的情况并做出相应的规划，而不是对已发生的情况做出回应。"],
+   lesson:"公众最错误的想法是「市场必须上涨才能赚钱」；正确策略可在任何一种市场上赚钱。"},
+];
+
+/* ---------- 主题频次 ---------- */
+const THEMES = [
+  ["风险控制 / 止损", 17],
+  ["纪律", 13],
+  ["耐心等待机会", 12],
+  ["趋势跟随", 10],
+  ["独立判断 / 不随波逐流", 9],
+  ["资金管理 / 仓位控制", 9],
+  ["心理与情绪管理", 8],
+  ["找到适合自己的方法", 7],
+];
+
+/* ---------- 渲染：筛选 ---------- */
+const filtersEl = document.getElementById("filters");
+let activeCat = "all";
+function buildFilters(){
+  const cats = [["all","全部",null]].concat(Object.entries(CAT).map(([k,v])=>[k,v.key,v.color]));
+  filtersEl.innerHTML = cats.map(([k,label,color])=>{
+    const dot = color ? `<span class="dot" style="background:${color}"></span>` : "";
+    return `<div class="chip ${k==="all"?"active":""}" data-cat="${k}">${dot}${label}</div>`;
+  }).join("");
+  filtersEl.querySelectorAll(".chip").forEach(c=>c.addEventListener("click",()=>{
+    filtersEl.querySelectorAll(".chip").forEach(x=>x.classList.remove("active"));
+    c.classList.add("active"); activeCat=c.dataset.cat; renderCards();
+  }));
+}
+
+/* ---------- 渲染：卡片 ---------- */
+const grid = document.getElementById("grid");
+function renderCards(){
+  grid.innerHTML = DATA.filter(d=>activeCat==="all"||d.cat===activeCat).map(d=>{
+    const color = CAT[d.cat].color;
+    const strat = d.strategy.length ? `<div class="block"><h4>策略与方法</h4><ul>${d.strategy.map(s=>`<li>${s}</li>`).join("")}</ul></div>` : "";
+    const risk = d.risk.length ? `<div class="block"><h4>风险管理</h4><ul>${d.risk.map(s=>`<li>${s}</li>`).join("")}</ul></div>` : "";
+    const quotes = d.quotes.length ? `<div class="quotes"><h4>金句</h4>${d.quotes.map(q=>`<p>${q}</p>`).join("")}</div>` : "";
+    const lesson = d.lesson && !d.lesson.includes("内容整理中") ? `<div class="lesson"><b>启示：</b>${d.lesson}</div>` : "";
+    return `<article class="card" id="card-${d.en.replace(/[^a-zA-Z]/g,"")}" style="--cat:${color}">
+      <div class="card-top">
+        <div><div class="name-cn">${d.cn}</div><div class="name-en">${d.en}</div></div>
+        <span class="badge" style="background:${color}">${CAT[d.cat].key}</span>
+      </div>
+      <div class="tagline">「${d.tag}」</div>
+      ${d.philo?`<div class="philo">${d.philo}</div>`:""}
+      ${strat}${risk}${quotes}${lesson}
+    </article>`;
+  }).join("");
+}
+
+/* ---------- 渲染：主题条形图 ---------- */
+function renderBars(){
+  const max = Math.max(...THEMES.map(t=>t[1]));
+  document.getElementById("bars").innerHTML = THEMES.map(t=>`
+    <div class="bar-row">
+      <div class="bar-label">${t[0]}</div>
+      <div class="bar-track"><div class="bar-fill" data-w="${(t[1]/max*100).toFixed(0)}%">${t[1]}</div></div>
+      <div class="bar-num">${t[1]}</div>
+    </div>`).join("");
+  requestAnimationFrame(()=>setTimeout(()=>{
+    document.querySelectorAll(".bar-fill").forEach(b=>b.style.width=b.dataset.w);
+  },100));
+}
+
+/* ---------- 渲染：SVG 全景图 ---------- */
+const svg = document.getElementById("mindmap");
+const NS = "http://www.w3.org/2000/svg";
+function el(tag, attrs){const n=document.createElementNS(NS,tag);for(const k in attrs)n.setAttribute(k,attrs[k]);return n;}
+
+function renderMap(){
+  const W=1000,H=620,CX=500,CY=310;
+  svg.innerHTML="";
+  // 中心
+  const center = el("circle",{cx:CX,cy:CY,r:46,fill:"#1c2642",stroke:"#f0a500",'stroke-width':2});
+  svg.appendChild(center);
+  svg.appendChild(el("circle",{cx:CX,cy:CY,r:34,fill:"none",stroke:"#f0a500",'stroke-width':1,'stroke-dasharray':"3 4",opacity:.5}));
+  const ct = el("text",{x:CX,y:CY-4,'text-anchor':"middle",fill:"#ffc94d",'font-size':16,'font-weight':800,"class":"mm-cat"});
+  ct.textContent="成功"; svg.appendChild(ct);
+  const ct2 = el("text",{x:CX,y:CY+16,'text-anchor':"middle",fill:"#ffc94d",'font-size':16,'font-weight':800,"class":"mm-cat"});
+  ct2.textContent="交易"; svg.appendChild(ct2);
+
+  const entries = Object.entries(CAT);
+  entries.forEach(([key,cat],i)=>{
+    const ang = (-90 + i*72) * Math.PI/180;
+    const cxx = CX + Math.cos(ang)*150, cyy = CY + Math.sin(ang)*150;
+    // 中心到分类连线
+    svg.appendChild(el("line",{x1:CX,y1:CY,x2:cxx,y2:cyy,stroke:cat.color,'stroke-width':2,"class":"mm-link",opacity:.55}));
+    const cg = el("g",{class:"mm-node",transform:`translate(${cxx},${cyy})`,cursor:"pointer"});
+    cg.appendChild(el("circle",{r:34,fill:"#18203a",stroke:cat.color,'stroke-width':2}));
+    const ctxt = el("text",{'text-anchor':"middle",dy:5,fill:"#eef",'font-size':12.5,'font-weight':700,"class":"mm-cat"});
+    ctxt.textContent=cat.key; cg.appendChild(ctxt);
+    cg.addEventListener("click",()=>{activeCat=key;filtersEl.querySelectorAll(".chip").forEach(x=>x.classList.toggle("active",x.dataset.cat===key));renderCards();});
+    svg.appendChild(cg);
+
+    // 该分类下的交易者
+    const traders = DATA.filter(d=>d.cat===key);
+    const spread = 62; // 度
+    const start = (-90 + i*72 - spread/2) * Math.PI/180;
+    traders.forEach((d,j)=>{
+      const a = start + (traders.length>1 ? (j/(traders.length-1))*spread : spread/2) * Math.PI/180;
+      const tx = CX + Math.cos(a)*280, ty = CY + Math.sin(a)*280;
+      svg.appendChild(el("line",{x1:cxx,y1:cyy,x2:tx,y2:ty,stroke:cat.color,'stroke-width':1,"class":"mm-link",opacity:.3}));
+      const g = el("g",{class:"mm-node",transform:`translate(${tx},${ty})`,cursor:"pointer"});
+      g.appendChild(el("circle",{r:7,fill:cat.color,stroke:"#0b1020",'stroke-width':2}));
+      const short = d.cn.replace(/·/g,"").slice(0,4);
+      const lbl = el("text",{x:11,y:4,fill:"#dfe6f6",'font-size':11.5,'font-weight':600,"class":"mm-label"});
+      lbl.textContent=short; g.appendChild(lbl);
+      g.addEventListener("click",()=>{const id="card-"+d.en.replace(/[^a-zA-Z]/g,"");document.getElementById(id)?.scrollIntoView({behavior:"smooth",block:"center"});});
+      svg.appendChild(g);
+    });
+  });
+}
+
+buildFilters();
+renderCards();
+renderBars();
+renderMap();
+</script>
+</body>
+</html>
