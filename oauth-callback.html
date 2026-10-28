@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>授权回调 · Double-Doubt的馆藏</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    min-height:100vh;
+    background: linear-gradient(140deg, #081f3d 0%, #103361 50%, #1a4a80 100%);
+    display:flex; align-items:center; justify-content:center;
+    padding:24px;
+  }
+  .card {
+    background: rgba(255,255,255,0.97);
+    border-radius:16px;
+    padding:44px 40px;
+    max-width:680px; width:100%;
+    box-shadow:0 20px 60px rgba(0,0,0,0.35);
+  }
+  .tag {
+    display:inline-block;
+    border:1.5px solid #5a90c8;
+    color:#0f3a6b;
+    border-radius:20px;
+    padding:5px 18px;
+    font-size:14px;
+    margin-bottom:20px;
+  }
+  h1 { color:#0f3a6b; font-size:26px; margin-bottom:14px; }
+  p { color:#555; font-size:15px; line-height:1.7; margin-bottom:18px; }
+  .token-box {
+    background:#0f3a6b; color:#cfe3f8;
+    border-radius:8px; padding:16px;
+    font-family:ui-monospace,Menlo,monospace;
+    font-size:13px; word-break:break-all;
+    margin-bottom:18px; min-height:60px;
+  }
+  button {
+    background:#0f3a6b; color:#fff; border:none;
+    padding:12px 32px; border-radius:6px;
+    font-size:15px; cursor:pointer;
+  }
+  button:hover { background:#1a4a80; }
+  .status { font-size:14px; color:#2a7a4a; margin-top:14px; }
+  .pending { color:#888; }
+</style>
+</head>
+<body>
+  <div class="card">
+    <span class="tag">OAuth 授权回调</span>
+    <h1>WordPress 授权结果</h1>
+    <p>本页面仅用于接收你本人的授权令牌（access token），不会把令牌发送给任何第三方。请复制下面的令牌，交回给豆包配置一键上传。</p>
+    <div class="token-box" id="tokenBox">正在读取授权结果…</div>
+    <button id="copyBtn">复制令牌</button>
+    <span class="status" id="status"></span>
+  </div>
+<script>
+(function(){
+  var box=document.getElementById('tokenBox');
+  var status=document.getElementById('status');
+  // 从 hash 解析 token（implicit flow）
+  var hash=window.location.hash.replace(/^#/,'');
+  var params={};
+  hash.split('&').forEach(function(pair){
+    var kv=pair.split('=');
+    params[decodeURIComponent(kv[0])]=decodeURIComponent(kv[1]||'');
+  });
+  var token=params.access_token;
+  if(token){
+    box.textContent=token;
+    box.classList.remove('pending');
+    status.textContent='授权成功，令牌已显示。';
+  } else {
+    box.textContent='未在回调地址中找到 access_token。可能是授权被取消，或返回了错误：'+(params.error||'');
+    box.classList.add('pending');
+  }
+  document.getElementById('copyBtn').addEventListener('click',function(){
+    if(!token){status.textContent='没有可复制的令牌。';return;}
+    navigator.clipboard.writeText(token).then(function(){
+      status.textContent='已复制到剪贴板。';
+    }).catch(function(){
+      var ta=document.createElement('textarea');
+      ta.value=token; document.body.appendChild(ta); ta.select();
+      try{document.execCommand('copy'); status.textContent='已复制。';}catch(e){status.textContent='复制失败，请手动选择复制。';}
+      document.body.removeChild(ta);
+    });
+  });
+})();
+</script>
+</body>
+</html>
