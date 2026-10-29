@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>作手 · 利弗莫尔交易哲学精解 · 核心逻辑图谱</title>
+<style>
+  :root{
+    --bg:#070b18; --bg2:#0d1426; --card:#121a31; --card2:#18223f;
+    --line:#26304f; --txt:#eaeef8; --sub:#9aa6c4; --muted:#6b7693;
+    --gold:#f0a500; --gold2:#ffc94d;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:"PingFang SC","Microsoft YaHei","Source Han Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+    background:radial-gradient(1200px 600px at 20% -10%,#1a2440 0%,transparent 55%),radial-gradient(1000px 500px at 100% 0%,#221735 0%,transparent 50%),var(--bg);
+    color:var(--txt); line-height:1.75; min-height:100vh;
+  }
+  .wrap{max-width:1220px;margin:0 auto;padding:0 24px}
+  header.hero{padding:64px 0 28px;text-align:center}
+  .kicker{display:inline-flex;align-items:center;gap:8px;font-size:13px;letter-spacing:3px;color:var(--gold);font-weight:600}
+  .kicker::before,.kicker::after{content:"";width:34px;height:1px;background:linear-gradient(90deg,transparent,var(--gold))}
+  .kicker::after{background:linear-gradient(90deg,var(--gold),transparent)}
+  h1.title{font-size:clamp(28px,4.8vw,48px);font-weight:800;margin:16px 0 8px;letter-spacing:2px;
+    background:linear-gradient(120deg,#fff 10%,var(--gold2) 50%,#ffd98a 90%);
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .subtitle{font-size:clamp(15px,2.4vw,18px);color:var(--sub);font-weight:500}
+  .hero-desc{max-width:820px;margin:18px auto 0;color:var(--sub);font-size:14.5px}
+  .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0 10px}
+  .stat{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;padding:16px 10px;text-align:center}
+  .stat b{display:block;font-size:30px;font-weight:800;color:var(--gold2)}
+  .stat span{display:block;margin-top:6px;font-size:12.5px;color:var(--sub)}
+  @media(max-width:720px){.stats{grid-template-columns:repeat(2,1fr)}}
+
+  .map-card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:18px;padding:20px;margin:26px 0;box-shadow:0 14px 40px rgba(0,0,0,.3)}
+  .sec-h{font-size:20px;font-weight:700;color:var(--txt)}
+  .sec-s{font-size:13px;color:var(--muted);margin-bottom:12px}
+  #mindmap{width:100%;height:auto;display:block}
+  .mm-label{font-size:12.5px;font-weight:700;pointer-events:none}
+  .mm-sub{font-size:10.5px;fill:var(--sub);pointer-events:none}
+
+  /* ===== 周期论深度专区 ===== */
+  .feature{background:linear-gradient(160deg,rgba(240,165,0,.10),rgba(240,165,0,.02) 40%,transparent);border:1px solid rgba(240,165,0,.35);border-radius:20px;padding:28px 24px;margin:30px 0;position:relative;overflow:hidden}
+  .feature::before{content:"";position:absolute;inset:0;background:radial-gradient(600px 300px at 80% 0%,rgba(240,165,0,.12),transparent 60%);pointer-events:none}
+  .feature .fh{display:flex;align-items:center;gap:12px;margin-bottom:6px;position:relative}
+  .feature .fh .ico{width:40px;height:40px;border-radius:10px;background:linear-gradient(135deg,var(--gold),#ffb52e);display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:#1a1400;box-shadow:0 6px 18px rgba(240,165,0,.4)}
+  .feature h2{font-size:24px;font-weight:800;position:relative}
+  .feature .ft{font-size:13.5px;color:var(--gold);font-weight:600;position:relative}
+  .duo{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:20px 0}
+  @media(max-width:860px){.duo{grid-template-columns:1fr}}
+  .duo .box{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;padding:18px}
+  .duo .box h4{font-size:16px;margin-bottom:6px}
+  .duo .box h4 .p{color:var(--gold);font-weight:800}
+  .duo .box p{font-size:13.5px;color:var(--sub);line-height:1.7}
+  .duo .box .kv{margin-top:10px;padding-top:10px;border-top:1px dashed var(--line);font-size:12.5px;color:var(--muted)}
+  .cycle-wrap{margin:26px 0 8px}
+  .cycle-wrap h3{font-size:17px;margin-bottom:4px}
+  .cycle-wrap .note{font-size:12.5px;color:var(--muted);margin-bottom:10px}
+  #cycle{width:100%;max-width:640px;margin:0 auto;display:block}
+  .flow{margin:22px 0}
+  .flow h3{font-size:17px;margin-bottom:10px}
+  .flow-steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+  @media(max-width:860px){.flow-steps{grid-template-columns:1fr 1fr}}
+  .flow-steps .step{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px;position:relative}
+  .flow-steps .step b{display:block;font-size:13px;color:var(--gold2);margin-bottom:4px}
+  .flow-steps .step span{font-size:12px;color:var(--sub)}
+  .flow-steps .step::after{content:"→";position:absolute;right:-12px;top:50%;transform:translateY(-50%);color:var(--gold);font-weight:800;font-size:16px}
+  .flow-steps .step:last-child::after{content:""}
+  @media(max-width:860px){.flow-steps .step::after{content:""}}
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin:20px 0}
+  @media(max-width:860px){.grid{grid-template-columns:1fr}}
+  .card{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:16px;padding:22px 20px 18px;position:relative;overflow:hidden;transition:transform .25s,box-shadow .25s}
+  .card:hover{transform:translateY(-5px);box-shadow:0 18px 40px rgba(0,0,0,.45)}
+  .card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--cat)}
+  .card h3{font-size:17px;font-weight:700;margin-bottom:4px;padding-left:8px;color:var(--txt)}
+  .card .tagline{font-size:12px;color:var(--cat);padding-left:8px;margin-bottom:12px;font-weight:600;opacity:.95}
+  .card ul{list-style:none;padding-left:8px}
+  .card li{font-size:13.5px;color:var(--sub);padding:5px 0 5px 18px;position:relative;line-height:1.62;border-bottom:1px dashed rgba(38,48,79,.5)}
+  .card li:last-child{border-bottom:none}
+  .card li::before{content:"";position:absolute;left:2px;top:14px;width:6px;height:6px;border-radius:50%;background:var(--cat)}
+  .card li b{color:var(--txt);font-weight:600}
+  .card .q{margin-top:12px;padding:10px 12px;background:rgba(255,255,255,.03);border-left:2px solid var(--cat);border-radius:0 10px 10px 0;font-size:12.5px;color:var(--txt);font-style:italic}
+
+  /* 五部曲 */
+  .ladder{margin:28px 0}
+  .ladder h3{font-size:19px;margin-bottom:4px}
+  .ladder .note{font-size:12.5px;color:var(--muted);margin-bottom:14px}
+  .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
+  @media(max-width:860px){.steps{grid-template-columns:1fr}}
+  .steps .s{background:linear-gradient(180deg,var(--card2),var(--card));border:1px solid var(--line);border-radius:14px;padding:14px;position:relative}
+  .steps .s .n{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--gold),#ffb52e);color:#1a1400;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:14px;margin-bottom:8px;box-shadow:0 4px 12px rgba(240,165,0,.35)}
+  .steps .s b{display:block;font-size:14px;margin-bottom:4px}
+  .steps .s span{font-size:11.5px;color:var(--sub);line-height:1.55}
+
+  .quotes{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin:26px 0}
+  @media(max-width:860px){.quotes{grid-template-columns:1fr}}
+  .q-card{background:linear-gradient(120deg,rgba(240,165,0,.10),transparent);border:1px solid rgba(240,165,0,.25);border-radius:14px;padding:16px 18px;color:var(--txt);font-size:14px}
+  .q-card .src{display:block;margin-top:8px;color:var(--muted);font-size:12px}
+  footer{padding:30px 0 60px;text-align:center;color:var(--muted);font-size:12.5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="hero">
+  <div class="kicker">CORE LOGIC MAP</div>
+  <h1 class="title">作手 · 利弗莫尔交易哲学精解</h1>
+  <div class="subtitle">以《股票作手回忆录》为经 · 以「股市周期论」为纬</div>
+  <p class="hero-desc">赵晓宇以实盘冠军的视角重读利弗莫尔，将「截断亏损、顺势而为、关键点交易」等百年智慧，与中国哲学（穷变通久、反者道之动、知行合一）融合，构建出「位置+逻辑」的周期论交易体系。本图全景提炼全书核心观点。</p>
+  <div class="stats">
+    <div class="stat"><b>28</b><span>章 · 层层进阶</span></div>
+    <div class="stat"><b>8</b><span>大核心主题</span></div>
+    <div class="stat"><b>2</b><span>周期论双要素</span></div>
+    <div class="stat"><b>5</b><span>进阶五部曲</span></div>
+  </div>
+</header>
+
+<div class="map-card">
+  <div class="sec-h">全书逻辑总览</div>
+  <div class="sec-s">中心为「作手之道」，八大主题环布四周，点击节点可跳转到对应详解</div>
+  <svg id="mindmap" viewBox="0 0 1000 760" xmlns="http://www.w3.org/2000/svg"></svg>
+</div>
+
+<!-- ============ 周期论深度专区 ============ -->
+<div class="feature" id="feature">
+  <div class="fh"><div class="ico">周</div><div><h2>股市周期论 · 深度解析</h2><div class="ft">本书的核心交易体系 · 作者沉淀 20 余年交易经历创立</div></div></div>
+
+  <div class="duo">
+    <div class="box">
+      <h4><span class="p">位置</span> · 技术趋势</h4>
+      <p>周期趋势中的某一特定阶段，本质上属于技术范畴。早期周期论中的「技术」要素，后精准定义为「位置」——即判断当前处于牛熊周期的哪个位置。</p>
+      <div class="kv">关键词：大势方向 · 裸K · 半年线（牛熊分界）· 位置定方向</div>
+    </div>
+    <div class="box">
+      <h4><span class="p">逻辑</span> · 驱动成因</h4>
+      <p>宏观层面的驱动，赋予交易者大局观与方向感。涵盖经济基本面与资金面：基本面决定炒作结构，资金面决定总体水位的高低。</p>
+      <div class="kv">关键词：宏观定调 · 板块风向 · 时代风口 · 逻辑定底气</div>
+    </div>
+  </div>
+
+  <div class="cycle-wrap">
+    <h3>穷变通久 · 周期五阶段</h3>
+    <div class="note">借用《周易·系辞下》「穷则变，变则通，通则久」——周期如四时更替，循环往复</div>
+    <svg id="cycle" viewBox="0 0 640 440"></svg>
+  </div>
+
+  <div class="flow">
+    <h3>核心规律：情绪变化永远落后于价格变化</h3>
+    <div class="flow-steps">
+      <div class="step"><b>① 价格异动</b><span>波动预警，如实观照，先于大众察觉</span></div>
+      <div class="step"><b>② 情绪发酵</b><span>大众认知修正，市场渐成共识</span></div>
+      <div class="step"><b>③ 逻辑自洽</b><span>事后解释浮出，逻辑由隐性转显性</span></div>
+      <div class="step"><b>④ 预期差消失</b><span>越显性，获利空间越小</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ 八大主题卡片 ============ -->
+<div class="grid" id="grid"></div>
+
+<!-- ============ 进阶五部曲 ============ -->
+<div class="map-card ladder">
+  <h3>交易者进阶五部曲</h3>
+  <div class="note">作者总结的成长路径，从愚昧走向超脱</div>
+  <div class="steps">
+    <div class="s"><div class="n">1</div><b>事实</b><span>如实观照，翻股票是基本功，尊重价格趋势</span></div>
+    <div class="s"><div class="n">2</div><b>规律</b><span>理解人性驱动的周期规律，找到边界条件</span></div>
+    <div class="s"><div class="n">3</div><b>情绪</b><span>利用大众情绪、化解自己情绪</span></div>
+    <div class="s"><div class="n">4</div><b>梦想</b><span>战略乐观、战术谨慎，坚信自己能成</span></div>
+    <div class="s"><div class="n">5</div><b>超脱</b><span>做对的事、把事情做对，顺其自然不问结果</span></div>
+  </div>
+</div>
+
+<!-- ============ 金句精选 ============ -->
+<div class="map-card">
+  <div class="sec-h">金句精选</div>
+  <div class="sec-s">贯穿全书的经典语录</div>
+  <div class="quotes">
+    <div class="q-card">「华尔街没有新鲜事，因为人性永不变。」理解市场，首先要理解人性；战胜市场，首先要战胜自己。<span class="src">—— 第三章 · 遵循基本原则</span></div>
+    <div class="q-card">「截断亏损，让利润奔跑」「永不摊平亏损仓位」——这两项原则已成为专业交易员资金管理的黄金准则。<span class="src">—— 序一</span></div>
+    <div class="q-card">「价格和其他东西一样，总是沿着阻力最小的方向运动。」<span class="src">—— 第十三章 · 阻力最小方向</span></div>
+    <div class="q-card">「赚大钱不能靠细碎的波动，而是要靠大势；我能挣到大钱从来不是因为我的思考，而是因为我的坚守。」<span class="src">—— 第十章 · 赚大钱靠坚守大势</span></div>
+    <div class="q-card">「知道什么不该做，比知道什么该做更加重要！」<span class="src">—— 第十一章</span></div>
+    <div class="q-card">「等待，不仅是一种策略，更是一种境界。」<span class="src">—— 第十四章 · 等待是一种境界</span></div>
+    <div class="q-card">「买人机会，卖出风险。」交易的核心在于时刻审视：边界条件是否改变？<span class="src">—— 第十五章 · 失去自我的危险</span></div>
+    <div class="q-card">「做对的事情，把事情做对。」顺其自然，不问结果。<span class="src">—— 第二十八章 · 超脱（引段永平）</span></div>
+  </div>
+</div>
+
+<footer>本图谱基于赵晓宇《作手：利弗莫尔交易哲学精解》（东北财经大学出版社）全书内容整理 · 仅供学习交流，不构成投资建议</footer>
+</div>
+
+<script>
+const data = [
+  {id:"trend", name:"顺势而为", sub:"交易第一原则", color:"#f0a500",
+   tag:"尊重市场 · 价格具有最高裁决权",
+   items:[
+     "<b>市场永远是对的</b>：尊重客观走势，不逆势抄底、不测顶",
+     "<b>做滑头</b>：不做死多头、不做死空头，只做顺势的一方",
+     "<b>阻力最小方向</b>：价格如水，总沿阻力最小的路径运动（第13章）",
+     "<b>牛多做多、熊多做空</b>：压力位/支撑位都服从大势",
+     "<b>逆势摊平成本</b>是最愚蠢的行为——用主观成本对抗客观趋势",
+     "<b>技术分析祛魅</b>：技术是「形」，逻辑是「神」，形神兼备才高胜率"
+   ],
+   q:"「尊重客观走势，价格具有最高裁决权」——周期论核心法则"},
+  {id:"risk", name:"截断亏损·让利润奔跑", sub:"风控铁律", color:"#ff5ea8",
+   tag:"资金管理的黄金准则",
+   items:[
+     "<b>永不摊平亏损仓位</b>：亏损加仓是深渊的开始",
+     "<b>盈利才加仓</b>：第一笔交易有利润，才做第二笔",
+     "<b>时刻归零、忘记成本</b>：只问「它现在还能涨吗」",
+     "<b>止损快、持盈久</b>：短线拼的是「错的时候伤得轻」",
+     "<b>控制回撤</b>是建功立业的根本，空仓是对本金最大的保护",
+     "<b>损失厌恶</b>：损失痛苦是盈利喜悦的 2~2.5 倍，故难割肉"
+   ],
+   q:"「失败者失败的经验比成功者成功的经验更珍贵。」"},
+  {id:"pivot", name:"关键点·最小阻力", sub:"入场方法论", color:"#4d8dff",
+   tag:"利弗莫尔的入场艺术",
+   items:[
+     "<b>试探→确认→加仓→兑现</b>：小仓试错，突破关键点再重仓",
+     "<b>破局点</b>：突破关键阻力、旧秩序被打破的「顿悟时刻」",
+     "<b>右侧交易</b>：不买在最低，买确定性而非最低价",
+     "<b>自上而下</b>：宏观定调 → 板块择主流 → 个股精选",
+     "<b>测试阻力</b>：用真金白银试探市场深浅（老手怀特的故事）",
+     "<b>伯利恒钢铁</b>：等股价逼近 100 关口才下注，两天赚 145 点"
+   ],
+   q:"「永远不要因为股价看起来太高而卖出，也不要因为太低而买入。」"},
+  {id:"macro", name:"大势思维", sub:"赚大钱靠坚守大势", color:"#2fd08a",
+   tag:"宏观格局决定收益天花板",
+   items:[
+     "<b>看对大盘，富可敌国</b>：先定大方向，再找切入点",
+     "<b>赚大钱靠坚守</b>：不是靠思考，而是持之以恒持有正确仓位",
+     "<b>位置+逻辑</b>：技术趋势（位置）+ 驱动成因（逻辑）相互验证",
+     "<b>逻辑基准+边界条件</b>：条件未变坚定持有，破坏果断离场",
+     "<b>机构定趋势、量化定波动</b>、情绪资金被反复鞭打",
+     "<b>熊牛转换</b>：领涨股疲态先于指数见顶，低价股/券商先见底"
+   ],
+   q:"「错误的时间做正确的事情是要命的。」"},
+  {id:"mind", name:"人性·心法", sub:"修心之道", color:"#b06bff",
+   tag:"战胜市场，先战胜自己",
+   items:[
+     "<b>价格波动反映群体心理</b>，而非单纯基本面",
+     "<b>孤独是交易者的宿命</b>：独立思考是生存基石",
+     "<b>情绪价值最没价值</b>：不寻求认同，只对账户负责",
+     "<b>利用大众情绪、化解自己情绪</b>（索罗斯式制胜）",
+     "<b>确认偏差</b>：他人的赞同会放大你的错误信念",
+     "<b>主动孤独≠被动孤独</b>：专业独立 vs 生活缺乏情感支持"
+   ],
+   q:"「孤独是投机者的宿命！」——利弗莫尔"},
+  {id:"grow", name:"认知·修行", sub:"成长之路", color:"#ff8a3d",
+   tag:"没有圣杯，唯有自渡",
+   items:[
+     "<b>股神也曾是股渣</b>：交学费是必然，用小成本试错",
+     "<b>没有圣杯</b>：任何单一技术长期胜率无限趋近 50%",
+     "<b>拒绝内幕</b>：靠运气赚的钱终会凭实力亏回去",
+     "<b>等待是一种境界</b>：不差踏空二十个点",
+     "<b>幸存者偏差</b>：一将功成万骨枯",
+     "<b>定期复盘交割单</b>：错误是最宝贵的经验"
+   ],
+   q:"「能让你赚钱的只有你自己。」"},
+  {id:"cycle", name:"周期论", sub:"核心体系", color:"#f0a500", feature:true,
+   tag:"位置+逻辑 · 穷变通久 · 情绪落后于价格",
+   items:[],
+   q:""},
+  {id:"phil", name:"中国哲学", sub:"文化根基", color:"#2fd08a",
+   tag:"以国学解西学",
+   items:[
+     "<b>易经</b>：穷变通久、吉吝厉悔咎凶、元龙有悔、阴极阳生",
+     "<b>儒家</b>：知行合一、中庸之道、君子以厚德载物",
+     "<b>道家</b>：反者道之动、无为而治、常无欲以观其妙",
+     "<b>佛家</b>：放下执念、无挂碍故无有恐怖",
+     "<b>兵法</b>：善战者求之于势、因势而制胜",
+     "<b>王阳明</b>：认知不到位，行为必扭曲"
+   ],
+   q:"「用自己喜欢的方式度过一生。」"}
+];
+
+// ---- mindmap ----
+(function(){
+  const svg=document.getElementById('mindmap');
+  const cx=500,cy=380,R=155,r=272,n=data.length;
+  const NS='http://www.w3.org/2000/svg';
+  const mk=(t)=>{const e=document.createElementNS(NS,t);return e;};
+  const txt=(x,y,s,cls,fill)=>{const t=mk('text');t.setAttribute('x',x);t.setAttribute('y',y);t.setAttribute('text-anchor','middle');t.setAttribute('class',cls);t.textContent=s;if(fill)t.setAttribute('fill',fill);return t;};
+
+  const cg=mk('g');
+  const halo=mk('circle');halo.setAttribute('cx',cx);halo.setAttribute('cy',cy);halo.setAttribute('r',R+10);halo.setAttribute('fill','none');halo.setAttribute('stroke','#f0a500');halo.setAttribute('stroke-width',6);halo.setAttribute('opacity',.15);
+  const cc=mk('circle');cc.setAttribute('cx',cx);cc.setAttribute('cy',cy);cc.setAttribute('r',R);cc.setAttribute('fill','rgba(240,165,0,.10)');cc.setAttribute('stroke','#f0a500');cc.setAttribute('stroke-width',2);
+  cg.appendChild(halo);cg.appendChild(cc);
+  cg.appendChild(txt(cx,cy-10,'作手之道', 'mm-label','#ffc94d'));
+  cg.appendChild(txt(cx,cy+16,'顺势 · 守心', 'mm-sub'));
+  svg.appendChild(cg);
+
+  data.forEach((d,i)=>{
+    const ang=2*Math.PI*i/n-Math.PI/2;
+    const x=cx+r*Math.cos(ang), y=cy+r*Math.sin(ang);
+    const sx=cx+R*Math.cos(ang), sy=cy+R*Math.sin(ang);
+    const l=mk('line');l.setAttribute('x1',sx);l.setAttribute('y1',sy);l.setAttribute('x2',x);l.setAttribute('y2',y);l.setAttribute('stroke',d.color);l.setAttribute('stroke-width',2);l.setAttribute('opacity',.45);
+    svg.appendChild(l);
+    const g=mk('g');g.style.cursor='pointer';
+    g.addEventListener('click',()=>{const el=document.getElementById(d.feature?'feature':'card-'+d.id);if(el)el.scrollIntoView({behavior:'smooth',block:'center'});});
+    const glow=mk('circle');glow.setAttribute('cx',x);glow.setAttribute('cy',y);glow.setAttribute('r',54);glow.setAttribute('fill',d.color);glow.setAttribute('opacity',.18);
+    const circ=mk('circle');circ.setAttribute('cx',x);circ.setAttribute('cy',y);circ.setAttribute('r',44);circ.setAttribute('fill',d.color);circ.setAttribute('stroke','#0b1020');circ.setAttribute('stroke-width',3);
+    g.appendChild(glow);g.appendChild(circ);
+    const nm=d.name;
+    const t1=mk('text');t1.setAttribute('x',x);t1.setAttribute('y',y-4);t1.setAttribute('text-anchor','middle');t1.setAttribute('fill','#0b1020');t1.setAttribute('font-size',12.5);t1.setAttribute('font-weight',800);
+    t1.textContent=nm.length>7?nm.slice(0,4):nm;
+    const t2=mk('text');t2.setAttribute('x',x);t2.setAttribute('y',y+16);t2.setAttribute('text-anchor','middle');t2.setAttribute('fill','#0b1020');t2.setAttribute('font-size',9.5);t2.setAttribute('opacity',.85);
+    t2.textContent=d.sub.length>7?d.sub.slice(0,7):d.sub;
+    g.appendChild(t1);g.appendChild(t2);
+    svg.appendChild(g);
+  });
+})();
+
+// ---- cycle diagram (穷变通久) ----
+(function(){
+  const svg=document.getElementById('cycle');
+  const NS='http://www.w3.org/2000/svg';
+  const mk=(t)=>{const e=document.createElementNS(NS,t);return e;};
+  const cx=320,cy=220,R=120;
+  const stages=[
+    {k:'穷', t:'旧事物发展到极致', d:'内部矛盾无法调和', c:'#b06bff'},
+    {k:'变', t:'破旧立新', d:'废墟上萌发新生命', c:'#ff5ea8'},
+    {k:'通', t:'新趋势确立', d:'获认可与资金跟随', c:'#f0a500'},
+    {k:'久', t:'新周期演绎', d:'持续性行情展开', c:'#2fd08a'},
+    {k:'穷', t:'久则穷 · 循环', d:'周而复始，物极必反', c:'#4d8dff'}
+  ];
+  const n=stages.length;
+  // arrows (cycle)
+  for(let i=0;i<n;i++){
+    const a1=2*Math.PI*i/n-Math.PI/2, a2=2*Math.PI*(i+1)/n-Math.PI/2;
+    const x1=cx+R*Math.cos(a1),y1=cy+R*Math.sin(a1);
+    const x2=cx+R*Math.cos(a2),y2=cy+R*Math.sin(a2);
+    const l=mk('line');l.setAttribute('x1',x1);l.setAttribute('y1',y1);l.setAttribute('x2',x2);l.setAttribute('y2',y2);l.setAttribute('stroke','#f0a500');l.setAttribute('stroke-width',2);l.setAttribute('opacity',.4);l.setAttribute('marker-end','url(#arr)');
+    svg.appendChild(l);
+  }
+  const defs=mk('defs');
+  const marker=mk('marker');marker.setAttribute('id','arr');marker.setAttribute('markerWidth',10);marker.setAttribute('markerHeight',10);marker.setAttribute('refX',7);marker.setAttribute('refY',5);marker.setAttribute('orient','auto');
+  const mp=mk('path');mp.setAttribute('d','M0,0 L10,5 L0,10 z');mp.setAttribute('fill','#f0a500');
+  marker.appendChild(mp);defs.appendChild(marker);svg.appendChild(defs);
+  // center
+  const cc=mk('circle');cc.setAttribute('cx',cx);cc.setAttribute('cy',cy);cc.setAttribute('r',44);cc.setAttribute('fill','rgba(240,165,0,.10)');cc.setAttribute('stroke','#f0a500');cc.setAttribute('stroke-width',1.5);
+  svg.appendChild(cc);
+  const ct=mk('text');ct.setAttribute('x',cx);ct.setAttribute('y',cy);ct.setAttribute('text-anchor','middle');ct.setAttribute('fill','#ffc94d');ct.setAttribute('font-size',13);ct.setAttribute('font-weight',800);ct.textContent='周期循环';
+  svg.appendChild(ct);
+  // nodes
+  stages.forEach((s,i)=>{
+    const a=2*Math.PI*i/n-Math.PI/2;
+    const x=cx+R*Math.cos(a), y=cy+R*Math.sin(a);
+    const g=mk('g');
+    const circ=mk('circle');circ.setAttribute('cx',x);circ.setAttribute('cy',y);circ.setAttribute('r',26);circ.setAttribute('fill',s.c);circ.setAttribute('stroke','#0b1020');circ.setAttribute('stroke-width',2);
+    g.appendChild(circ);
+    const t1=mk('text');t1.setAttribute('x',x);t1.setAttribute('y',y+5);t1.setAttribute('text-anchor','middle');t1.setAttribute('fill','#0b1020');t1.setAttribute('font-size',16);t1.setAttribute('font-weight',800);t1.textContent=s.k;
+    g.appendChild(t1);
+    // label outside
+    const lx=x, ly=y+(y>cy?34:-28);
+    const l1=mk('text');l1.setAttribute('x',lx);l1.setAttribute('y',ly);l1.setAttribute('text-anchor','middle');l1.setAttribute('fill','#eaeef8');l1.setAttribute('font-size',12);l1.setAttribute('font-weight',700);l1.textContent=s.t;
+    const l2=mk('text');l2.setAttribute('x',lx);l2.setAttribute('y',ly+15);l2.setAttribute('text-anchor','middle');l2.setAttribute('fill','#9aa6c4');l2.setAttribute('font-size',10);l2.textContent=s.d;
+    g.appendChild(l1);g.appendChild(l2);
+    svg.appendChild(g);
+  });
+})();
+
+// ---- cards ----
+(function(){
+  const grid=document.getElementById('grid');
+  data.forEach(d=>{
+    if(d.feature) return;
+    const card=document.createElement('div');
+    card.className='card';card.id='card-'+d.id;
+    card.style.setProperty('--cat',d.color);
+    card.innerHTML='<h3>'+d.name+' · '+d.sub+'</h3><div class="tagline">'+d.tag+'</div><ul>'+d.items.map(x=>'<li>'+x+'</li>').join('')+'</ul><div class="q">'+d.q+'</div>';
+    grid.appendChild(card);
+  });
+})();
+</script>
+</body>
+</html>
